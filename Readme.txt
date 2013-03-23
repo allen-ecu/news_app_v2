@@ -31,10 +31,11 @@ Introduction:
 This app allow user to enter a news in the browser.
 The browser sends the news to the server.
 The server saves the news to database.
-The server looks up the database and load news in the browser by google map.
+The server looks up the database and load news in the browser on Google map.
 The browser lists the latest news within the user's area according to his IP address.
 Server: web/webapp/main.dart
 Client: 127.0.0.1:8080
+Both the client and server are written in Dart Language M3.
 
 Contact:
 -------------------------------
