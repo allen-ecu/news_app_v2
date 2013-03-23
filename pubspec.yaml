@@ -1,0 +1,11 @@
+name: map_app
+description: A sample application using dart, stream, json, google maps api
+dependencies:
+  stream:
+    git: 'git://github.com/rikulo/stream.git'
+  google_maps: any
+  js: any
+  xml: any
+
+#  js: any
+#  unittest: any
