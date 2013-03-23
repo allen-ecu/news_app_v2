@@ -1,7 +1,8 @@
 What to Fix:
 Not sure how to get POST data sent from the browser side in the server side.
 However, c/s can talk and the server side can tell the length of the content.
-
+This app is incompatible with Stream v0.6.0
+This app is run on Steam v0.5.5
 Following Steps:
 Upload photo to server.
 Get IP address from user.
