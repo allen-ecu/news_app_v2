@@ -1,6 +1,6 @@
 What to Fix:
 Not sure how to get POST data sent from the browser side in the server side.
-However, c/s can talk and the server side can tell the length of content.
+However, c/s can talk and the server side can tell the length of the content.
 
 Following Steps:
 Upload photo to server.
@@ -29,3 +29,5 @@ The browser sends the news to the server.
 The server saves the news to database.
 The server looks up the database and load news in the browser by google map.
 The browser lists the latest news within the user's area according to his IP address.
+Server: web/webapp/main.dart
+Client: 127.0.0.1:8080
