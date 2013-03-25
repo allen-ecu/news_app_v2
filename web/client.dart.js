@@ -7762,21 +7762,20 @@ $.ajaxSendJSON = function() {
 };
 
 $.mapTOJSON = function() {
-  $.Primitives_printString("mapping json...");
   var obj = $.HashMap$();
   obj.$indexSet(obj, "title", $.get$usrTitle().get$value() == null ? "none" : $.get$usrTitle().get$value());
   obj.$indexSet(obj, "description", $.get$usrDesc().get$value() == null ? "none" : $.get$usrDesc().get$value());
   obj.$indexSet(obj, "photo", $.$$eq$o($.get$usrPhoto().get$value(), "none"));
   obj.$indexSet(obj, "time", $.get$usrTime() == null ? "none" : $.get$usrTime().get$value());
   obj.$indexSet(obj, "ip", "191.23.3.1");
-  $.Primitives_printString("sending json to server...");
+  $.Primitives_printString("Sending JSON to the server...");
   return $._JsonStringifier_stringify(obj);
 };
 
 $.processString = function(jsonString) {
   var news, firstNews, t1;
   news = $.parse(jsonString, null);
-  $.Primitives_printString("json string:");
+  $.Primitives_printString("JSON to send:");
   $.Primitives_printString($.toString$0$abfnosu(jsonString));
   firstNews = $.$$index$as(news, 0);
   t1 = $.getInterceptor$as(firstNews);
@@ -7789,7 +7788,6 @@ $.processString = function(jsonString) {
 };
 
 $.complete = function() {
-  $.Primitives_printString("complete!");
 };
 
 $.handleError = function(error) {

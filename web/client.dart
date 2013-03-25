@@ -90,7 +90,6 @@ void ajaxSendJSON()
 
 String mapTOJSON()
 {
-  print('mapping json...');
   var obj = new Map();
   obj['title'] = usrTitle.value==null? "none":usrTitle.value;
   obj['description'] = usrDesc.value==null? "none":usrDesc.value;
@@ -98,7 +97,7 @@ String mapTOJSON()
   obj['time'] = usrTime==null? "none":usrTime.value; 
   obj['ip']= '191.23.3.1';
   //obj["ip"] = usrTime==null? "none":usrTime; 
-  print('sending json to server...');
+  print('Sending JSON to the server...');
   return Json.stringify(obj); // convert map to String i.e. JSON
   //return obj;
 }
@@ -136,7 +135,7 @@ void handleError(AsyncError error) {
 processString(String jsonString) {
   //load local json file
   var news = Json.parse(jsonString);
-  print('json string:');
+  print('JSON to send:');
   print(jsonString);
   
   assert(news is List);
@@ -156,7 +155,7 @@ processString(String jsonString) {
 
 complete()
 {
-  print('complete!');
+  //to do
   
 }
 

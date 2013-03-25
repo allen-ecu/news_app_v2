@@ -2,6 +2,7 @@
 library server;
 
 import "dart:io";
+import "package:rikulo_commons/io.dart" as rio;
 import "dart:json" as Json;
 import "package:stream/stream.dart";
 import 'package:xml/xml.dart' as xml;

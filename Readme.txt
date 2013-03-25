@@ -1,7 +1,6 @@
 What to Fix:
 -----------------------------
-Not sure how to get POST data sent from the browser side in the server side.
-However, c/s can talk and the server side can tell the length of the content.
+Now the server can get POST data sent from the browser side!!
 
 Notice:
 -------------------------------
@@ -10,6 +9,7 @@ This app is run on Steam v0.5.5
 
 Following Steps:
 -------------------------------
+Save data to file
 Upload photo to server.
 Get IP address from user.
 Save date to WebDB or IndexedDB
@@ -23,8 +23,8 @@ The server: response addstream : Hello
 
 Versions:
 -------------------------------
-Last Version: V1
-This Version: V2
+Last Version: V2
+This Version: V2.1
 
 Introduction:
 -------------------------------
