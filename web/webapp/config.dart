@@ -7,7 +7,8 @@ final PORT = 8080;
 //URI mapping
 var _mapping = {
   "/": home,
-  "/news": serverInfo,
+  "/send": serverInfo,
+  "/receive": clientInfo,
 };
 
 var _errormapping = {

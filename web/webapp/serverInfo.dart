@@ -6,27 +6,30 @@ var vDescription;
 var vPhoto;
 var vTime;
 
+
 //NO NEED HttpServer IF YOU ARE USING RIKULO STREAM SERVER, BECAUSE YOU DO NOT NEED TWO SERVERS
 void serverInfo(HttpConnect connect){
   
   var _cxs = new List<HttpConnect>();
   var request = connect.request;
   var response = connect.response;
+
+  List<String> result = new List<String>();
   
-  if(request.uri.path == '/news' && request.method == 'POST')
+  if(request.uri.path == '/send' && request.method == 'POST')
   {    
     response.addString('Welcome from the server!');
-    List<String> result = new List<String>();
     
-    void convertASCII(int key)
+    //convert from ASCII decimal to char
+    convertASCII(int key)
     {
-      //convert from ASCII decimal to char
       String temp = new String.fromCharCode(key);
       result.add(temp);
     }
     
-    void printAll()
+    printAll()
     {
+      //convert json data to Stri
       StringBuffer sb = new StringBuffer();
       result.forEach((String key)=>sb.add(key));
       String res = sb.toString();
@@ -38,8 +41,18 @@ void serverInfo(HttpConnect connect){
       print(parsedMap['title']==''?'none':parsedMap['title']);
       print(parsedMap['description']==''?'none':parsedMap['description']);
       print(parsedMap['photo']==false?'none':parsedMap['photo']);
-      print(parsedMap['time']==''?'none':parsedMap['time']);
+      print(parsedMap['time']==false?'none':parsedMap['time']);
       print(parsedMap['ip']==''?'none':parsedMap['ip']);
+      
+      //save Json string to file
+      void finishWrite()
+      {
+        print('file write completed.');
+      }
+      //write json to file
+      var jsonFile = new File('JSON.json');
+      jsonFile.writeAsString(res, mode: FileMode.APPEND, encoding: Encoding.UTF_8)
+      ..whenComplete(finishWrite);
     }
     
     //listen to the incoming JSON data
@@ -56,35 +69,36 @@ void serverInfo(HttpConnect connect){
   }
   else
   {
-    response.addString('Not found');
+    response.addString('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
     connect.close();
 }
 
-/*
-void serverInfo(HttpConnect connect, NewsInfo news) {
-  // Read an XML file.
-  //handleXML(uriXML);
-  //print("vDescription");
-  //final info = {"title": vTitle, "description": vDescription, "photo": vPhoto, "time": vTime};
-  final info = {"title": news.title, "description": news.description, "photo": news.photo, "time": news.time};
-  connect.response
-    ..headers.contentType = contentTypes["json"]
-    ..addString(Json.stringify(info));
-  connect.close();
-}
-
-void handleXML(var xmlDoc) {
+void clientInfo(HttpConnect connect) {
   
-  try {
-    vTitle = xmlDoc.query('title').text;
-    vDescription = xmlDoc.query('description').text;
-    vPhoto = xmlDoc.query('photo').text;
-    vTime = xmlDoc.query('time').text;
+  var request = connect.request;
+  var response = connect.response;
+  
+  if(request.uri.path == '/receive' && request.method == 'GET')
+  {
     
-  } catch(e) {
-    print('$uriXML doesn\'t have correct XML formatting.');
+  String output = 'none';
+  
+  File jsonDoc = new File('JSON.json');
+  Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
+  onFinished.then((stringData) => output = stringData.toString());
+
+  print(output);
+  //response.headers.contentType = contentTypes['application/json'];
+  connect.response
+    //..headers.contentType = contentTypes["json"]
+    ..addString(output);
   }
+  else
+  {
+    response.addString('<a href=\'\\\'>Oops!Let us go home!</a>');
+    response.statusCode = HttpStatus.NOT_FOUND;
+  }
+    connect.close();
 }
-*/

@@ -6704,15 +6704,15 @@ $$._PendingSendPortFinder_visitMap_anon = {"": "Closure;this_0",
   }
 };
 
-$$.main_anon = {"": "Closure;",
-  call$1: function(e) {
-    $.ajaxSendJSON();
-  }
-};
-
 $$._FutureImpl__handleError_anon = {"": "Closure;error_0,errorFuture_1",
   call$0: function() {
     this.errorFuture_1._sendError$1(this.error_0);
+  }
+};
+
+$$.main_anon = {"": "Closure;",
+  call$1: function(e) {
+    $.ajaxSendJSON();
   }
 };
 
@@ -6766,6 +6766,13 @@ $$._WhenFuture__sendError_anon = {"": "Closure;box_0,this_1",
   }
 };
 
+$$._RemoteSendPortSync__call_anon = {"": "Closure;box_0",
+  call$1: function(e) {
+    var result = $.parse(e.get$detail(), null);
+    this.box_0.result_0 = result;
+  }
+};
+
 $$.invokeClosure_anon = {"": "Closure;closure_0",
   call$0: function() {
     return this.closure_0.call$0();
@@ -6793,13 +6800,6 @@ $$._BaseSendPort_call_anon = {"": "Closure;completer_0,port_1",
       t1.completeError$1(value);
     else
       t1.complete$1(value);
-  }
-};
-
-$$._RemoteSendPortSync__call_anon = {"": "Closure;box_0",
-  call$1: function(e) {
-    var result = $.parse(e.get$detail(), null);
-    this.box_0.result_0 = result;
   }
 };
 
@@ -6879,16 +6879,21 @@ $$.anon = {"": "Closure;this_0",
   }
 };
 
-$$.ReceivePortSync_receive_anon = {"": "Closure;this_0",
-  call$1: function(e) {
-    var data, t1, replyTo, message, result;
-    data = $.parse(e.get$detail(), null);
-    t1 = $.getInterceptor$as(data);
-    replyTo = t1.$index(data, 0);
-    t1 = t1.$index(data, 1);
-    message = $._JsDeserializer$().deserialize$1(t1);
-    result = this.this_0._callback$1(message);
-    $._dispatchEvent(replyTo, $._JsSerializer$().traverse$1(result));
+$$.Stream_elementAt_anon = {"": "Closure;box_0,future_1",
+  call$1: function(value) {
+    var t1 = this.box_0;
+    if ($.$$eq$o(t1.index_0, 0) === true) {
+      this.future_1._liblib1$_setValue$1(value);
+      t1.subscription_1.cancel$0();
+      return;
+    }
+    t1.index_0 = $.$$sub$n(t1.index_0, 1);
+  }
+};
+
+$$.Stream_elementAt_anon0 = {"": "Closure;future_2",
+  call$0: function() {
+    this.future_2._setError$1($.AsyncError$($.StateError$("Not enough elements for elementAt"), null));
   }
 };
 
@@ -6907,21 +6912,16 @@ $$.ToString__emitMap_anon = {"": "Closure;box_0,result_1,visiting_2",
   }
 };
 
-$$.Stream_elementAt_anon = {"": "Closure;box_0,future_1",
-  call$1: function(value) {
-    var t1 = this.box_0;
-    if ($.$$eq$o(t1.index_0, 0) === true) {
-      this.future_1._liblib1$_setValue$1(value);
-      t1.subscription_1.cancel$0();
-      return;
-    }
-    t1.index_0 = $.$$sub$n(t1.index_0, 1);
-  }
-};
-
-$$.Stream_elementAt_anon0 = {"": "Closure;future_2",
-  call$0: function() {
-    this.future_2._setError$1($.AsyncError$($.StateError$("Not enough elements for elementAt"), null));
+$$.ReceivePortSync_receive_anon = {"": "Closure;this_0",
+  call$1: function(e) {
+    var data, t1, replyTo, message, result;
+    data = $.parse(e.get$detail(), null);
+    t1 = $.getInterceptor$as(data);
+    replyTo = t1.$index(data, 0);
+    t1 = t1.$index(data, 1);
+    message = $._JsDeserializer$().deserialize$1(t1);
+    result = this.this_0._callback$1(message);
+    $._dispatchEvent(replyTo, $._JsSerializer$().traverse$1(result));
   }
 };
 
@@ -7749,6 +7749,7 @@ Isolate.$finishClasses($$, $, null);
 $$ = null;
 
 $.main = function() {
+  $.ajaxGetJSON();
   $.HttpRequest_getString($.uri, null, null).then$1($.processString).whenComplete$1($.complete).catchError$1($.handleError);
   document.query$1("#submit").get$onClick().listen$1(new $.main_anon());
 };
@@ -7756,7 +7757,7 @@ $.main = function() {
 $.ajaxSendJSON = function() {
   var request = new XMLHttpRequest();
   request.get$onReadyStateChange().listen$1(new $.ajaxSendJSON_anon(request));
-  request.open$3("POST", "/news", true);
+  request.open$3("POST", "/send", true);
   request.setRequestHeader("Content-Type", "application/json");
   request.send($.mapTOJSON());
 };
@@ -7797,6 +7798,25 @@ $.handleError = function(error) {
 
 $.loadMap = function(vTitle, vDescription, vPhoto, vUserTime, MarkerImage) {
   $.scoped(new $.loadMap_anon(vTitle, vDescription, vPhoto, vUserTime, MarkerImage));
+};
+
+$.ajaxGetJSON = function() {
+  $.HttpRequest_getString("/receive", null, null).then$1($.onDataLoaded);
+};
+
+$.onDataLoaded = function(responseText) {
+  var news, firstNews, t1;
+  news = $.parse(responseText, null);
+  $.Primitives_printString("client: json analysing:");
+  $.Primitives_printString($.toString$0$abfnosu(responseText));
+  firstNews = $.$$index$as(news, 0);
+  t1 = $.getInterceptor$as(firstNews);
+  $.title = t1.$index(firstNews, "title");
+  $.description = t1.$index(firstNews, "description");
+  $.photo = t1.$index(firstNews, "photo");
+  $.time = t1.$index(firstNews, "time");
+  $.ip = t1.$index(firstNews, "ip");
+  $.Primitives_printString("analysing okay...");
 };
 
 $.Arrays_copy = function(src, srcStart, dst, dstStart, count) {
@@ -10111,6 +10131,8 @@ $.complete.call$0 = $.complete;
 $.complete.$name = "complete";
 $.handleError.call$1 = $.handleError;
 $.handleError.$name = "handleError";
+$.onDataLoaded.call$1 = $.onDataLoaded;
+$.onDataLoaded.$name = "onDataLoaded";
 $.IsolateNatives__processWorkerMessage.call$2 = $.IsolateNatives__processWorkerMessage;
 $.IsolateNatives__processWorkerMessage.$name = "IsolateNatives__processWorkerMessage";
 $.$$throw.call$1 = $.$$throw;

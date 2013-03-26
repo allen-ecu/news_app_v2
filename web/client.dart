@@ -33,7 +33,9 @@ String ip = 'none';
 var uri = 'news.json';
 
 void main() {
- 
+  //get JSON from the server
+  ajaxGetJSON();
+  
   //load local JSON
   HttpRequest.getString(uri)
   .then(processString)
@@ -80,13 +82,12 @@ void ajaxSendJSON()
                                                          }
   );
   // POST the data to the server
-  var url = "/news";
+  var url = "/send";
   request.open("POST", url, true);
   request.setRequestHeader("Content-Type", "application/json");
   request.send(mapTOJSON()); // perform the async POST
   //request.onLoadEnd.listen((e) => loadEnd(request));
 }
-
 
 String mapTOJSON()
 {
@@ -99,7 +100,6 @@ String mapTOJSON()
   //obj["ip"] = usrTime==null? "none":usrTime; 
   print('Sending JSON to the server...');
   return Json.stringify(obj); // convert map to String i.e. JSON
-  //return obj;
 }
 
 /*
@@ -192,43 +192,6 @@ query('#$eid').replaceWith(elem);
 }
 */
 
-void responseJSON() {
-  query("#submit").onClick.listen((e) {      
-        HttpRequest.request("/news").then(
-            (request) {
-              var news = Json.parse(request.response);
-              print('json string:');
-              print(news);
-              
-              assert(news is List);
-              var firstNews = news[0];
-              assert(news[0] is Map);
-              
-              title = firstNews['title'];
-              description = firstNews['description'];
-              photo = firstNews['photo'];
-              time = firstNews['time'];
-              ip = firstNews['ip'];
-              
-              print('$title,$description,$photo,$time,$ip');
-            });
-      });
-  
-  /*
-  document.query("#submit").onClick.listen(
-    (e) {
-      HttpRequest.request("/server-info").then(
-        (request) {
-          Map news = Json.parse(request.responseText);
-          title = news["title"];
-          description = news["description"];
-          photo = news["photo"];
-          time = news["time"];;
-        });
-    });
-    */
-}
-
 void loadMap(var vTitle, var vDescription, var vPhoto, var vUserTime, var MarkerImage) {
   
   js.scoped((){
@@ -290,7 +253,7 @@ void loadMap(var vTitle, var vDescription, var vPhoto, var vUserTime, var Marker
 
 void ajaxGetJSON(){
  
-  var url = "$HOST:$PORT/news";
+  var url = "/receive";
   // call the web server asynchronously
   var request = HttpRequest.getString(url).then(onDataLoaded);
 }
@@ -298,7 +261,7 @@ void ajaxGetJSON(){
 // print the raw json response text from the server
 void onDataLoaded(String responseText) {
   var news = Json.parse(responseText);
-  print('json string:');
+  print('client: json analysing:');
   print(responseText);
   
   assert(news is List);
@@ -310,5 +273,5 @@ void onDataLoaded(String responseText) {
   photo = firstNews['photo'];
   time = firstNews['time'];
   ip = firstNews['ip'];
-  print('transfommer');
+  print('analysing okay...');
 }
