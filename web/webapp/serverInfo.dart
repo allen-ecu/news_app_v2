@@ -8,6 +8,7 @@ var vTime;
 
 
 //NO NEED HttpServer IF YOU ARE USING RIKULO STREAM SERVER, BECAUSE YOU DO NOT NEED TWO SERVERS
+//Receive JSON data from the browser, and save it to local JSON.json file
 void serverInfo(HttpConnect connect){
   
   var _cxs = new List<HttpConnect>();
@@ -33,7 +34,7 @@ void serverInfo(HttpConnect connect){
       StringBuffer sb = new StringBuffer();
       result.forEach((String key)=>sb.add(key));
       String res = sb.toString();
-      //{"title":"kjk","photo":false,"time":"2013-02-28T11:11","description":"jkjk","ip":"191.23.3.1"}
+      //{"title":"kjk","photo":false,"time":"2013-02-28T11:11","description":"jkjk","ip":"191.23.3.1","lat":"none","long":"none"}
       print(res);
       
       //parse all the data
@@ -43,6 +44,8 @@ void serverInfo(HttpConnect connect){
       print(parsedMap['photo']==false?'none':parsedMap['photo']);
       print(parsedMap['time']==false?'none':parsedMap['time']);
       print(parsedMap['ip']==''?'none':parsedMap['ip']);
+      print(parsedMap['lat']==''?'0':parsedMap['lat']);
+      print(parsedMap['long']==''?'0':parsedMap['long']);
       
       //save Json string to file
       void finishWrite()
@@ -51,8 +54,17 @@ void serverInfo(HttpConnect connect){
       }
       //write json to file
       var jsonFile = new File('JSON.json');
-      jsonFile.writeAsString(res, mode: FileMode.APPEND, encoding: Encoding.UTF_8)
-      ..whenComplete(finishWrite);
+      if(jsonFile.existsSync())
+      {
+        jsonFile.writeAsString(',$res', mode: FileMode.APPEND, encoding: Encoding.UTF_8)
+        ..whenComplete(finishWrite);
+      }
+      else
+      {
+        jsonFile.writeAsString('$res', mode: FileMode.WRITE, encoding: Encoding.UTF_8)
+        ..whenComplete(finishWrite);
+      }
+      
     }
     
     //listen to the incoming JSON data
@@ -75,6 +87,7 @@ void serverInfo(HttpConnect connect){
     connect.close();
 }
 
+//Load local JSON.json data and send it to the browser
 void clientInfo(HttpConnect connect) {
   
   var request = connect.request;
@@ -83,17 +96,17 @@ void clientInfo(HttpConnect connect) {
   if(request.uri.path == '/receive' && request.method == 'GET')
   {
     
-  String output = 'none';
-  
   File jsonDoc = new File('JSON.json');
-  Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
-  onFinished.then((stringData) => output = stringData.toString());
+  //use Sync method
+  String data = jsonDoc.readAsStringSync(Encoding.UTF_8);
 
-  print(output);
-  //response.headers.contentType = contentTypes['application/json'];
+  //Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
+  //onFinished.then((stringData) => output = stringData);
+  //to use Async method can't give the value to output
+
   connect.response
-    //..headers.contentType = contentTypes["json"]
-    ..addString(output);
+    ..headers.contentType = contentTypes["application/json"]
+    ..addString('[$data]');
   }
   else
   {

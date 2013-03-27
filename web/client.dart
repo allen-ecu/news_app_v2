@@ -29,12 +29,15 @@ String description = 'none';
 String photo = 'none';
 String time = 'none';
 String ip = 'none';
-
+num lat = 0;
+num long = 0;
 var uri = 'news.json';
 
 void main() {
-  //get JSON from the server
+  //receive JSON from the server
   ajaxGetJSON();
+  
+  //load JSON to google map
   
   //load local JSON
   HttpRequest.getString(uri)
@@ -42,8 +45,7 @@ void main() {
   .whenComplete(complete)
   .catchError(handleError);
 
-  //responseJSON;
-  
+  //submit user input(JSON) to the server
   query('#submit').onClick.listen((e){
   ajaxSendJSON();
   });
@@ -96,7 +98,9 @@ String mapTOJSON()
   obj['description'] = usrDesc.value==null? "none":usrDesc.value;
   obj['photo'] = usrPhoto.value=="none";
   obj['time'] = usrTime==null? "none":usrTime.value; 
-  obj['ip']= '191.23.3.1';
+  obj['ip']= ip;
+  obj['lat'] = lat;
+  obj['long'] = long;
   //obj["ip"] = usrTime==null? "none":usrTime; 
   print('Sending JSON to the server...');
   return Json.stringify(obj); // convert map to String i.e. JSON
@@ -135,22 +139,19 @@ void handleError(AsyncError error) {
 processString(String jsonString) {
   //load local json file
   var news = Json.parse(jsonString);
-  print('JSON to send:');
-  print(jsonString);
   
   assert(news is List);
-  var firstNews = news[0];
   assert(news[0] is Map);
   
   //set data to variables
-  title = firstNews['title'];
-  description = firstNews['description'];
-  photo = firstNews['photo'];
-  time = firstNews['time'];
-  ip = firstNews['ip'];
+  //title = firstNews['title'];
+  //description = firstNews['description'];
+  //photo = firstNews['photo'];
+  //time = firstNews['time'];
+  //ip = firstNews['ip'];
   
   //pass data to the map
-  loadMap(title, description, photo, time, markerIMG);
+  loadMap(news, markerIMG);
 }
 
 complete()
@@ -192,7 +193,41 @@ query('#$eid').replaceWith(elem);
 }
 */
 
-void loadMap(var vTitle, var vDescription, var vPhoto, var vUserTime, var MarkerImage) {
+void loadMap(List<Map> data, var MarkerImage) {
+  
+  /*
+  
+   if (navigator.geolocation)
+        {
+        navigator.geolocation.getCurrentPosition(getPosition,showError);
+        return true;
+        }
+      else{
+        x.innerHTML="Geolocation is not supported by this browser.";
+        return false;
+        }
+    }
+
+function getPosition(position)
+    {
+    sessionStorage.localLat = position.coords.latitude;
+    sessionStorage.localLon = position.coords.longitude;
+    }
+    
+    //reverseGeocoding
+      geocoder = new google.maps.Geocoder();
+      
+      geocoder.geocode({'latLng': des}, function(results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            if (results[1]) {
+              sessionStorage.address = results[0].formatted_address;
+            } else {
+              sessionStorage.address = 'No results found';
+            }
+          } else {
+            sessionStorage.address = 'Geocoder failed due to: ' + status;
+          }
+   */
   
   js.scoped((){
     //map options
@@ -215,54 +250,85 @@ void loadMap(var vTitle, var vDescription, var vPhoto, var vUserTime, var Marker
     ..url = MarkerImage;
     
     //set popup contents
-    var content = new DivElement();
-    content.innerHtml='''
-    <div id="news" style="width=100px">
-    <b>$vTitle</b>
-    <p>$vDescription</p>
-    <p>$vPhoto</p>
-    <b>$vUserTime</b>
-    </div>
-    ''';
-    
-    var infoWindow = new InfoWindow(
-        new InfoWindowOptions()
-        ..content = content
-    );
-    
-    //initialize marker1
-    var marker1 = new Marker(new MarkerOptions()
-    ..position = centre
-    ..map = map
-    ..draggable = false
-    ..shape = makerShape
-    ..animation = Animation.DROP
-    ..icon = markerIcon
-    );
 
-    //mouseover trigger contents window pops up
-    marker1.on.mouseover.add((e) {
-      infoWindow.open(map, marker1);
-    });
+    List<DivElement> divEle= new List<DivElement>();
+    List<InfoWindow> infoWind= new List<InfoWindow>();
+    List<Marker> gooMarker= new List<Marker>();
+    List<LatLng> latLongs = new List<LatLng>();
     
-    //keep objects live
-    jsw.retainAll([map, marker1, makerShape, infoWindow]);
-    
+    for (int i = 0; i< data.length; i++)
+    {
+      //setup all lat long coordinates
+      LatLng latlong = new LatLng(data[i]['lat'],data[i]['long']);
+      latLongs.add(latlong);
+      
+      String vTitle = data[i]['title'];
+      String vDescription = data[i]['description'];
+      String vPhoto = data[i]['photo'];
+      String vUserTime = data[i]['time'];
+      
+      //setup info windows
+      var content = new DivElement();
+      content.innerHtml='''
+          <div id="news" style="width=5px">
+          <b>$vTitle</b>
+          <p>$vDescription</p>
+          <p>$vPhoto</p>
+          <b>$vUserTime</b>
+          </div>
+          ''';
+      divEle.add(content);
+      
+      var infoWindow = new InfoWindow(
+          new InfoWindowOptions()
+          ..content = divEle[i]
+      );
+      infoWind.add(infoWindow);
+      
+      
+      //initialize marker1
+      var marker = new Marker(new MarkerOptions()
+      ..position = latLongs[i] //ip address
+      ..map = map
+      ..draggable = false
+      ..shape = makerShape
+      ..animation = Animation.DROP
+      ..icon = markerIcon
+      );
+      
+      gooMarker.add(marker);
+      
+      //mouseover trigger contents window pops up
+      gooMarker[i].on.mouseover.add((e) {
+        infoWind[i].open(map, gooMarker[i]);
+      });
+      
+      //mouseout trigger contents window closed
+      gooMarker[i].on.mouseout.add((e) {
+        infoWind[i].close();
+      });
+      
+      //keep objects live
+      jsw.retainAll([map, gooMarker[i], makerShape, infoWind[i]]);
+      
+    }
   });
 }
 
+//get json data from server
 void ajaxGetJSON(){
  
   var url = "/receive";
   // call the web server asynchronously
-  var request = HttpRequest.getString(url).then(onDataLoaded);
+  var request = HttpRequest.getString(url).then(processString);
 }
 
-// print the raw json response text from the server
+// analysing json data sent from server
 void onDataLoaded(String responseText) {
   var news = Json.parse(responseText);
-  print('client: json analysing:');
-  print(responseText);
+  print('client: received json:');
+  print('responseText $responseText');
+  print('Json.parse $news');
   
   assert(news is List);
   var firstNews = news[0];
@@ -272,6 +338,9 @@ void onDataLoaded(String responseText) {
   description = firstNews['description'];
   photo = firstNews['photo'];
   time = firstNews['time'];
+  lat = firstNews['lat'];
+  long = firstNews['long'];
   ip = firstNews['ip'];
+  print(title);
   print('analysing okay...');
 }
