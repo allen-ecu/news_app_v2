@@ -14,10 +14,12 @@ import 'package:js/js.dart' as js;
 part 'config.dart';
 
 GMap map;
+Geocoder geocoder;
+
 final LatLng centre = jsw.retain(new LatLng(-29.5,132.1));
 //var uriXML = 'news.xml';
-var markerIMG = 'combined.png';
-
+final markerImg = 'markerImg.png';
+final markerShadow = 'markerShadow.png';
 InputElement usrTitle= query('#title');
 TextAreaElement usrDesc = query('#description');
 InputElement usrPhoto = query('#photo');
@@ -34,30 +36,21 @@ num long = 0;
 var uri = 'news.json';
 
 void main() {
+  
   //receive JSON from the server
   ajaxGetJSON();
-  
-  //load JSON to google map
-  
+ 
   //load local JSON
-  HttpRequest.getString(uri)
-  .then(processString)
-  .whenComplete(complete)
-  .catchError(handleError);
+  //HttpRequest.getString(uri)
+  //.then(processString)
+  //.whenComplete(complete)
+  //.catchError(handleError);
 
   //submit user input(JSON) to the server
   query('#submit').onClick.listen((e){
   ajaxSendJSON();
+  ajaxGetJSON();
   });
-  
-  //ajaxGetJSON();
-  // Read an XML file.
-  //receiveXML(uriXML);
-  
-  // Send JSON
-  //ajaxSendJSON();
-  
-  // Load Google Map
   
 }
 
@@ -99,8 +92,8 @@ String mapTOJSON()
   obj['photo'] = usrPhoto.value=="none";
   obj['time'] = usrTime==null? "none":usrTime.value; 
   obj['ip']= ip;
-  obj['lat'] = lat;
-  obj['long'] = long;
+  obj['lat'] = double.parse(window.localStorage['Lat']);
+  obj['long'] = double.parse(window.localStorage['Lng']);
   //obj["ip"] = usrTime==null? "none":usrTime; 
   print('Sending JSON to the server...');
   return Json.stringify(obj); // convert map to String i.e. JSON
@@ -151,9 +144,10 @@ processString(String jsonString) {
   //ip = firstNews['ip'];
   
   //pass data to the map
-  loadMap(news, markerIMG);
+  loadMap(news, markerImg);
 }
 
+/*
 complete()
 {
   //to do
@@ -164,7 +158,7 @@ handleError(AsyncError error) {
   print('Uh oh, there was an error.');
   print(error.toString());
 }
-
+*/
 /*
 void changeInputElemPlaceHolder(String eid, String evalue){
 var elem = new InputElement();
@@ -195,42 +189,47 @@ query('#$eid').replaceWith(elem);
 
 void loadMap(List<Map> data, var MarkerImage) {
   
-  /*
-  
-   if (navigator.geolocation)
-        {
-        navigator.geolocation.getCurrentPosition(getPosition,showError);
-        return true;
-        }
-      else{
-        x.innerHTML="Geolocation is not supported by this browser.";
-        return false;
-        }
-    }
+  js.scoped((){
 
-function getPosition(position)
-    {
-    sessionStorage.localLat = position.coords.latitude;
-    sessionStorage.localLon = position.coords.longitude;
+    //Get latitude and longitude:
+    if (window.navigator.geolocation != null) {
+      window.navigator.geolocation.getCurrentPosition().then((position) {
+        js.scoped(() {
+          var pos = new LatLng(position.coords.latitude,position.coords.longitude);
+          window.localStorage['Lat'] =pos.lat.toString();
+          window.localStorage['Lng'] =pos.lng.toString();
+        });
+      }, onError : (error) {
+        print('Oops, something wrong with geoloation service!');
+      });
+    } else {
+      print('Your browser does not support Google geoloation!');
     }
     
-    //reverseGeocoding
-      geocoder = new google.maps.Geocoder();
-      
-      geocoder.geocode({'latLng': des}, function(results, status) {
-          if (status == google.maps.GeocoderStatus.OK) {
-            if (results[1]) {
-              sessionStorage.address = results[0].formatted_address;
-            } else {
-              sessionStorage.address = 'No results found';
-            }
-          } else {
-            sessionStorage.address = 'Geocoder failed due to: ' + status;
-          }
-   */
-  
-  js.scoped((){
-    //map options
+    //Get geographic address from Latitude and Longitude:
+    geocoder = jsw.retain(new Geocoder());
+    final LatLng latlng = jsw.retain(new LatLng(double.parse(window.localStorage['Lat']), double.parse(window.localStorage['Lng'])));
+    final request = new GeocoderRequest()
+      ..location = latlng  // TODO bad variable "latlng" in example code
+      ;
+    
+    //call geocoder to fetch address:
+    geocoder.geocode(request, (List<GeocoderResult> results, GeocoderStatus status) {
+      if (status == GeocoderStatus.OK) {
+        if (results[0] != null) {
+          jsw.release(latlng);
+          window.localStorage['Address'] = results[0].formattedAddress;
+        } else {
+          window.alert('No results found');
+        }
+      } else {
+        window.alert('Geocoder failed due to: ${status}');
+      }
+    });
+    
+    //Google map:
+    
+    //set map options
     final mapOptions = new MapOptions()
       ..zoom = 4
       ..center = centre
@@ -240,17 +239,19 @@ function getPosition(position)
     //var myLayer = new GLayer("org.wikipedia.en");
     map = jsw.retain(new GMap(query("#mapholder"), mapOptions));
     
-    //clickable area
+    //set clickable area
     var makerShape = new MarkerShape();
     makerShape.coords = [20,6,22,7,23,8,24,9,25,10,25,11,25,12,25,13,25,14,25,15,25,16,25,17,25,18,25,19,24,20,23,21,22,22,20,23,19,24,8,24,5,23,4,22,4,21,4,20,4,19,10,18,9,17,8,16,8,15,7,14,7,13,7,12,8,11,8,10,8,9,9,8,10,7,11,6,20,6];
     makerShape.type = MarkerShapeType.POLY;
     
     //set marker icon
     final markerIcon = new Icon()
-    ..url = MarkerImage;
+    ..url = markerImg;
     
+    final markerIconShadow = new Icon()
+    ..url = markerShadow;
+   
     //set popup contents
-
     List<DivElement> divEle= new List<DivElement>();
     List<InfoWindow> infoWind= new List<InfoWindow>();
     List<Marker> gooMarker= new List<Marker>();
@@ -286,7 +287,7 @@ function getPosition(position)
       infoWind.add(infoWindow);
       
       
-      //initialize marker1
+      //set markers
       var marker = new Marker(new MarkerOptions()
       ..position = latLongs[i] //ip address
       ..map = map
@@ -294,23 +295,23 @@ function getPosition(position)
       ..shape = makerShape
       ..animation = Animation.DROP
       ..icon = markerIcon
+      ..shadow = markerIconShadow
       );
       
       gooMarker.add(marker);
       
-      //mouseover trigger contents window pops up
+      //set mouseover trigger contents window pops up
       gooMarker[i].on.mouseover.add((e) {
         infoWind[i].open(map, gooMarker[i]);
       });
       
-      //mouseout trigger contents window closed
+      //set mouseout trigger contents window closed
       gooMarker[i].on.mouseout.add((e) {
         infoWind[i].close();
       });
       
       //keep objects live
-      jsw.retainAll([map, gooMarker[i], makerShape, infoWind[i]]);
-      
+      jsw.retainAll([map, gooMarker[i], makerShape, infoWind[i]]); 
     }
   });
 }
