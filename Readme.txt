@@ -1,4 +1,39 @@
 Change Log:
+V2.5
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+1.to polish the info window
+2.upload photo to the server
+3.refine the json format
+4.validate the users input before submt
+
+Next:
+-------------------------------
+Retrieve the JSON data from the server.
+Upload photo to server.
+Get IP address from user.
+Save date to WebDB or IndexedDB
+Load news from DB and send to client
+
+What has changed?
+-------------------------------
+Customized InfoWindow, put css photo carosoul, comment, and more details.
+When the users submit the data, the lat,lnt coordinates will be sent to the server as well
+Changed to new marker icons
+The server now can save the data using Sync read method.
+The client can receive the json data from the server
+Now the browser will load the data json feed from the server when its loading
+No need HttpServer, because we are using a server named Steam 0.6.0
+The client : send json and set header content-type:application/json
+The server: response addstream : Hello
+
+Versions:
+-------------------------------
+Last Version: V2.3
+This Version: V2.4
+
+Change Log:
 V2.4
 ------------------------------------------------------------------
 What to Fix:
@@ -133,6 +168,8 @@ Notice:
 -------------------------------
 This app is incompatible with Stream v0.6.0
 This app is run on Steam v0.5.5
+Disable the apache server is you have
+Remove Avast V8 Antivirus Software if you have connection problem
 Contact:
 -------------------------------
 Author: Mao Weiqing

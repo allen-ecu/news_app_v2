@@ -1,6 +1,6 @@
 * {
 	line-height: 1.6;
-	font: 12px Helvetica, arial, freesans, clean, sans-serif;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 h1 {
   font-size: 20px;
@@ -24,7 +24,6 @@ b {
   margin-left: 10px;
 }
 .header {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-weight: bold;
   border-bottom-style: solid;
   border-bottom-color: #CCCCCC;
@@ -52,8 +51,8 @@ b {
 .news {
   position: absolute; 
   width: 400px;
-  min-height: 250px; 
-  margin-top: 285px;
+  min-height: 228px; 
+  margin-top: 315px;
   margin-left:10px;
   margin-bottom: 20px;
   background-color: #fff;
@@ -80,7 +79,7 @@ tr {
   margin:10px;
   }
 table {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 div #mapholder {
     width: auto;
@@ -90,3 +89,212 @@ div #mapholder {
     padding: 10px;
     border-style: dotted; border-width: thin; border-top-color: 1; border-right-color: 1; border-bottom-color: 1; border-left-color: 1
   }
+tr td {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: small;
+  font-weight: normal;
+  font-style: normal;
+  color: #000000;
+}
+td div {
+  font-size: 85%;
+  }
+/*overview tab */
+#infotitle {
+  height: 33px;
+  border-bottom-style: inset;
+  border-bottom-width: thin;
+  border-bottom-color: #CCCCCC;
+  
+}
+#infotable {
+  width: 250px;
+}
+#infotime {
+  width: 22%;
+  border-bottom-style: inset;
+  border-bottom-width: thin;
+  border-bottom-color: #CCCCCC;
+}
+#infodesc {
+  text-align:justify;
+  width: 35%;
+  border-left-style: inset;
+  border-left-width: thin;
+  border-left-color: #CCCCCC;
+  padding: 3px;
+}
+/*css tab */
+.tabs {
+  position: relative;
+  min-height: 245px;
+  clear: both;
+  margin: 15px 0;
+}
+.tab {
+  float: left;
+}
+.tab label {
+  background: #fff;
+  padding: 5px;
+  border: 1px solid #ccc;
+  margin-left: -1px;
+  position: relative;
+  left: 1px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: small;
+}
+.tab [type=radio] {
+  display: none;
+}
+.content {
+  position: absolute;
+  top: 27px;
+  left: 0;
+  background: white;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #ffcc66;
+  width: 261px;
+}
+[type=radio]:checked ~ label {
+  background: #fff;
+  border-bottom: 1px solid white;
+  border-left:1px solid #ffcc66;
+  border-top:1px solid #ffcc66;
+  border-right:1px solid #ffcc66;
+  z-index: 2;
+}
+[type=radio]:checked ~ label ~ .content {
+  z-index: 1;
+}
+/* css carousel*/
+@-webkit-keyframes FadeInOut {
+ 0% {
+   opacity:1;
+ }
+ 17% {
+   opacity:1;
+ }
+ 25% {
+   opacity:0;
+ }
+ 92% {
+   opacity:0;
+ }
+ 100% {
+   opacity:1;
+ }
+}
+
+@-moz-keyframes FadeInOut {
+ 0% {
+   opacity:1;
+ }
+ 17% {
+   opacity:1;
+ }
+ 25% {
+   opacity:0;
+ }
+ 92% {
+   opacity:0;
+ }
+ 100% {
+   opacity:1;
+ }
+}
+
+@-o-keyframes FadeInOut {
+ 0% {
+   opacity:1;
+ }
+ 17% {
+   opacity:1;
+ }
+ 25% {
+   opacity:0;
+ }
+ 92% {
+   opacity:0;
+ }
+ 100% {
+   opacity:1;
+ }
+}
+
+@keyframes FadeInOut {
+ 0% {
+   opacity:1;
+ }
+ 17% {
+   opacity:1;
+ }
+ 25% {
+   opacity:0;
+ }
+ 92% {
+   opacity:0;
+ }
+ 100% {
+   opacity:1;
+ }
+}
+
+#carousel {
+  position:absolute;
+  height:207px;
+  width:257px;
+  margin:0;
+}
+#carousel img {
+  position:absolute;
+  left:0px;
+  right:0px;
+}
+
+#carousel img {
+  -webkit-animation-name: FadeInOut;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-duration: 16s;
+
+  -moz-animation-name: FadeInOut;
+  -moz-animation-timing-function: ease-in-out;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-duration: 16s;
+
+  -o-animation-name: FadeInOut;
+  -o-animation-timing-function: ease-in-out;
+  -o-animation-iteration-count: infinite;
+  -o-animation-duration: 16s;
+
+  animation-name: FadeInOut;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 16s;
+}
+#carousel img:nth-of-type(1) {
+  -webkit-animation-delay: 12s;
+  -moz-animation-delay: 12s;
+  -o-animation-delay: 12s;
+  animation-delay: 12s;
+}
+#carousel img:nth-of-type(2) {
+  -webkit-animation-delay: 8s;
+  -moz-animation-delay: 8s;
+  -o-animation-delay: 8s;
+  animation-delay: 8s;
+}
+#carousel img:nth-of-type(3) {
+  -webkit-animation-delay: 4s;
+  -moz-animation-delay: 4s;
+  -o-animation-delay: 4s;
+  animation-delay: 4s;
+}
+#carousel img:nth-of-type(4) {
+  -webkit-animation-delay: 0;
+  -moz-animation-delay: 0;
+  -o-animation-delay: 0;
+  animation-delay: 0;
+}

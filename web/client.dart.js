@@ -1143,9 +1143,6 @@ $$.Object = {"": ";",
   get$value: function() {
     return this.noSuchMethod$1(this, $.createInvocationMirror("value", "get$value", 1, [], []));
   },
-  get$mouseout: function() {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("mouseout", "get$mouseout", 1, [], []));
-  },
   get$_entrySize: function() {
     return this.noSuchMethod$1(this, $.createInvocationMirror("_entrySize", "get$_entrySize", 1, [], []));
   },
@@ -1394,6 +1391,9 @@ $$.Object = {"": ";",
   },
   set$center: function($0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("center=", "set$center", 2, [$0], []));
+  },
+  set$maxWidth: function($0) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("maxWidth=", "set$maxWidth", 2, [$0], []));
   },
   set$innerHtml: function($0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("innerHtml=", "set$innerHtml", 2, [$0], []));
@@ -6629,9 +6629,6 @@ $$.GMap = {"": "MVCObject;_jsProxy",
 };
 
 $$.GMapEvents = {"": "Object;_gmap",
-  get$mouseout: function() {
-    return $.MouseEventListenerAdder$(this._gmap, "mouseout");
-  },
   get$mouseover: function() {
     return $.MouseEventListenerAdder$(this._gmap, "mouseover");
   }
@@ -6718,9 +6715,6 @@ $$.Marker = {"": "MVCObject;_jsProxy",
 };
 
 $$.MarkerEvents = {"": "Object;_marker",
-  get$mouseout: function() {
-    return $.MouseEventListenerAdder$(this._marker, "mouseout");
-  },
   get$mouseover: function() {
     return $.MouseEventListenerAdder$(this._marker, "mouseover");
   }
@@ -6842,6 +6836,10 @@ $$.InfoWindowOptions = {"": "IsJsProxy;_jsProxy",
       this.get$$$().set$content($content);
     else
       throw $.$$throw($.UnsupportedError$("Parameter must be of type String or Node"));
+  },
+  set$maxWidth: function(maxWidth) {
+    this.get$$$().set$maxWidth(maxWidth);
+    return maxWidth;
   },
   set$position: function(position) {
     this.get$$$().set$position(position);
@@ -7132,15 +7130,15 @@ $$.Stream_isEmpty_anon0 = {"": "Closure;future_2",
   }
 };
 
-$$._PendingSendPortFinder_visitMap_anon = {"": "Closure;this_0",
-  call$1: function(e) {
-    return this.this_0._liblib6$_dispatch$1(e);
-  }
-};
-
 $$._FutureImpl__handleError_anon = {"": "Closure;error_0,errorFuture_1",
   call$0: function() {
     this.errorFuture_1._sendError$1(this.error_0);
+  }
+};
+
+$$._PendingSendPortFinder_visitMap_anon = {"": "Closure;this_0",
+  call$1: function(e) {
+    return this.this_0._liblib6$_dispatch$1(e);
   }
 };
 
@@ -7200,24 +7198,6 @@ $$.Geocoder_geocode___anon = {"": "Closure;",
   }
 };
 
-$$.invokeClosure_anon = {"": "Closure;closure_0",
-  call$0: function() {
-    return this.closure_0.call$0();
-  }
-};
-
-$$.invokeClosure_anon0 = {"": "Closure;closure_1,arg1_2",
-  call$0: function() {
-    return this.closure_1.call$1(this.arg1_2);
-  }
-};
-
-$$.invokeClosure_anon1 = {"": "Closure;closure_3,arg1_4,arg2_5",
-  call$0: function() {
-    return this.closure_3.call$2(this.arg1_4, this.arg2_5);
-  }
-};
-
 $$._RemoteSendPortSync__call_anon = {"": "Closure;box_0",
   call$1: function(e) {
     var result = $.parse(e.get$detail(), null);
@@ -7237,19 +7217,21 @@ $$._BaseSendPort_call_anon = {"": "Closure;completer_0,port_1",
   }
 };
 
-$$._FutureImpl__scheduleUnhandledError_anon = {"": "Closure;this_0",
+$$.invokeClosure_anon = {"": "Closure;closure_0",
   call$0: function() {
-    var t1, error;
-    t1 = this.this_0;
-    if (t1.get$_hasUnhandledError() === true) {
-      t1.set$_state($.$$and$n(t1.get$_state(), 4294967291));
-      error = t1.get$_resultOrListeners();
-      $.Primitives_printString("Uncaught Error: " + $.S(error.get$error()));
-      t1 = error.get$stackTrace();
-      if (t1 != null)
-        $.Primitives_printString("Stack Trace:\n" + $.S(t1) + "\n");
-      throw $.$$throw(error.get$error());
-    }
+    return this.closure_0.call$0();
+  }
+};
+
+$$.invokeClosure_anon0 = {"": "Closure;closure_1,arg1_2",
+  call$0: function() {
+    return this.closure_1.call$1(this.arg1_2);
+  }
+};
+
+$$.invokeClosure_anon1 = {"": "Closure;closure_3,arg1_4,arg2_5",
+  call$0: function() {
+    return this.closure_3.call$2(this.arg1_4, this.arg2_5);
   }
 };
 
@@ -7281,6 +7263,22 @@ $$.Stream_reduce_anon0 = {"": "Closure;result_5",
 $$.Stream_reduce_anon1 = {"": "Closure;box_0,result_6",
   call$0: function() {
     this.result_6._liblib0$_setValue$1(this.box_0.value_0);
+  }
+};
+
+$$._FutureImpl__scheduleUnhandledError_anon = {"": "Closure;this_0",
+  call$0: function() {
+    var t1, error;
+    t1 = this.this_0;
+    if (t1.get$_hasUnhandledError() === true) {
+      t1.set$_state($.$$and$n(t1.get$_state(), 4294967291));
+      error = t1.get$_resultOrListeners();
+      $.Primitives_printString("Uncaught Error: " + $.S(error.get$error()));
+      t1 = error.get$stackTrace();
+      if (t1 != null)
+        $.Primitives_printString("Stack Trace:\n" + $.S(t1) + "\n");
+      throw $.$$throw(error.get$error());
+    }
   }
 };
 
@@ -7561,13 +7559,6 @@ $$._deserialize_deserializeObject = {"": "Closure;",
   }
 };
 
-$$.Primitives_applyFunction_anon = {"": "Closure;namedArguments_0,buffer_1,arguments_2",
-  call$1: function($name) {
-    $.add$1$a(this.buffer_1, "$" + $.S($name));
-    $.add$1$a(this.arguments_2, $.$$index$as(this.namedArguments_0, $name));
-  }
-};
-
 $$._NativeJsSendPort_send_anon = {"": "Closure;this_1,message_2,replyTo_3",
   call$0: function() {
     var t1, t2, t3, isolate, shouldSerialize, msg;
@@ -7606,6 +7597,13 @@ $$._NativeJsSendPort_send__anon = {"": "Closure;box_0,this_4,shouldSerialize_5",
       t2 = this.box_0;
       t1._liblib6$_callback$2(t2.msg_0, t2.reply_1);
     }
+  }
+};
+
+$$.Primitives_applyFunction_anon = {"": "Closure;namedArguments_0,buffer_1,arguments_2",
+  call$1: function($name) {
+    $.add$1$a(this.buffer_1, "$" + $.S($name));
+    $.add$1$a(this.arguments_2, $.$$index$as(this.namedArguments_0, $name));
   }
 };
 
@@ -7676,6 +7674,18 @@ $$.IsolateNatives__processWorkerMessage_function = {"": "Closure;entryPoint_0,re
   }
 };
 
+$$.NoSuchMethodError_toString_anon = {"": "Closure;box_0",
+  call$2: function(key, value) {
+    var t1 = this.box_0;
+    if ($.$$gt$n(t1.i_1, 0) === true)
+      $.add$1$a(t1.sb_0, ", ");
+    $.add$1$a(t1.sb_0, key);
+    $.add$1$a(t1.sb_0, ": ");
+    $.add$1$a(t1.sb_0, $.Error_safeToString(value));
+    t1.i_1 = $.$$add$n(t1.i_1, 1);
+  }
+};
+
 $$._JsonStringifier_stringifyJsonValue_anon = {"": "Closure;box_0,this_1",
   call$2: function(key, value) {
     var t1, t2, t3;
@@ -7691,18 +7701,6 @@ $$._JsonStringifier_stringifyJsonValue_anon = {"": "Closure;box_0,this_1",
     $.add$1$a(t2.get$sb(), "\":");
     t2.stringifyValue$1(value);
     t1.first_0 = false;
-  }
-};
-
-$$.NoSuchMethodError_toString_anon = {"": "Closure;box_0",
-  call$2: function(key, value) {
-    var t1 = this.box_0;
-    if ($.$$gt$n(t1.i_1, 0) === true)
-      $.add$1$a(t1.sb_0, ", ");
-    $.add$1$a(t1.sb_0, key);
-    $.add$1$a(t1.sb_0, ": ");
-    $.add$1$a(t1.sb_0, $.Error_safeToString(value));
-    t1.i_1 = $.$$add$n(t1.i_1, 1);
   }
 };
 
@@ -8147,9 +8145,9 @@ $$._convertDartToNative_PrepareForStructuredClone_walk_anon = {"": "Closure;box_
 
 $$.loadMap_anon = {"": "Closure;data_1",
   call$0: function() {
-    var t1, t2, t3, t4, latlng, request, t5, t6, mapOptions, makerShape, markerIcon, markerIconShadow, divEle, infoWind, gooMarker, latLongs, box_0, box_00, vTitle, vDescription, t7, vPhoto, t8, vUserTime, $content, t9, t10, t11, t12, t13, t14, t15;
+    var t1, t2, t3, t4, latlng, request, t5, t6, mapOptions, makerShape, markerIcon, markerIconShadow, divEle, infoWind, gooMarker, latLongs, box_0, box_00, vTitle, vDescription, t7, vPhoto, t8, vUserTime, $content, t9, t10, t11, t12, t13, t14;
     if (window.navigator.geolocation != null)
-      window.navigator.geolocation.getCurrentPosition$0().then$2$onError(new $.loadMap__anon1(), new $.loadMap__anon2());
+      window.navigator.geolocation.getCurrentPosition$0().then$2$onError(new $.loadMap__anon0(), new $.loadMap__anon1());
     else
       $.Primitives_printString("Your browser does not support Google geoloation!");
     t1 = $.Geocoder$();
@@ -8164,7 +8162,7 @@ $$.loadMap_anon = {"": "Closure;data_1",
     $._jsGlobalize.callSync$1($._serialize(t3.toJs$0()));
     request = $.GeocoderRequest$();
     request.set$location(latlng);
-    $.geocoder.geocode$2(request, new $.loadMap__anon3(latlng));
+    $.geocoder.geocode$2(request, new $.loadMap__anon2(latlng));
     t5 = $.get$MapTypeId_ROADMAP();
     t6 = $.get$centre();
     mapOptions = $.MapOptions$();
@@ -8229,7 +8227,7 @@ $$.loadMap_anon = {"": "Closure;data_1",
         throw $.ioore(t8);
       vUserTime = $.$$index$as(t1[t8], "time");
       $content = document.createElement("div");
-      $content.set$innerHtml("          <div id=\"news\" style=\"width=5px\">\n          <b>" + $.S(vTitle) + "</b>\n          <p>" + $.S(vDescription) + "</p>\n          <p>" + $.S(vPhoto) + "</p>\n          <b>" + $.S(vUserTime) + "</b>\n          </div>\n          ");
+      $content.set$innerHtml("<div class=\"tabs\">\n  <div class=\"tab\">\n    <input id=\"tab-1\" checked=\"checked\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-1\">Overview</label>\n    <div class=\"content\">\n      <table id=\"infotable\">\n                <tr>\n                  <td colspan=\"2\" id=\"infotitle\">" + $.S(vTitle) + "</td>\n                </tr>\n                <tr>\n                  <td id=\"infotime\">" + $.S(vUserTime) + "</td>\n                  <td rowspan=\"2\" id=\"infodesc\"><div>" + $.S(vDescription) + "</div></td>\n                </tr>\n                <tr>\n                  <td>" + $.S(vPhoto) + "</td>\n                </tr>\n        </table>\n    </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-2\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-2\">Details</label>\n    <div class=\"content\">\n      Details </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-3\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-3\">Photos</label>\n    <div id=\"carousel\"class=\"content\">\n      <div id=\"carousel\">\n      <img src=\"photo1.fw.png\" alt=\"1\">\n      <img src=\"photo2.fw.png\" alt=\"2\">\n      <img src=\"photo3.fw.png\" alt=\"3\">\n      <img src=\"photo4.fw.png\" alt=\"4\">\n      <img src=\"photo5.fw.png\" alt=\"5\">\n      </div>\n    </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-4\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-4\">Comments</label>\n    <div class=\"content\">\n      <div>User: </div>\n      <div id=\"opinions\">Comment:</div>\n      <textarea class=\"text\" id=\"comment\" name=\"comment\" placeholder= \"Enter your news comments here\" cols=\"32\" rows=\"5\"></textarea> </div>\n  </div>\n</div>            \n      ");
       divEle.push($content);
       t9 = box_0.i_0;
       if (t9 !== (t9 | 0))
@@ -8239,6 +8237,7 @@ $$.loadMap_anon = {"": "Closure;data_1",
       t9 = divEle[t9];
       t10 = $.InfoWindowOptions$();
       t10.set$content(t9);
+      t10.set$maxWidth(275);
       infoWind.push($.InfoWindow$(t10));
       t9 = $.get$Animation_DROP();
       t11 = $.map;
@@ -8264,27 +8263,20 @@ $$.loadMap_anon = {"": "Closure;data_1",
         throw $.ioore(t9);
       t11 = gooMarker[t9].get$on().get$mouseover();
       t11.add$1(t11, new $.loadMap__anon(box_0, infoWind, gooMarker));
-      t11 = box_0.i_0;
-      if (t11 !== (t11 | 0))
-        throw $.iae(t11);
-      if (t11 < 0 || t11 >= gooMarker.length)
-        throw $.ioore(t11);
-      t12 = gooMarker[t11].get$on().get$mouseout();
-      t12.add$1(t12, new $.loadMap__anon0(box_0, infoWind));
-      t12 = $.map;
-      t14 = box_0.i_0;
-      if (t14 !== (t14 | 0))
-        throw $.iae(t14);
-      if (t14 < 0 || t14 >= gooMarker.length)
-        throw $.ioore(t14);
-      t15 = gooMarker[t14];
-      if (t14 >= infoWind.length)
-        throw $.ioore(t14);
-      $.CONSTANT4.forEach$1([t12, t15, makerShape, infoWind[t14]], $.retain);
+      t11 = $.map;
+      t12 = box_0.i_0;
+      if (t12 !== (t12 | 0))
+        throw $.iae(t12);
+      if (t12 < 0 || t12 >= gooMarker.length)
+        throw $.ioore(t12);
+      t14 = gooMarker[t12];
+      if (t12 >= infoWind.length)
+        throw $.ioore(t12);
+      $.CONSTANT4.forEach$1([t11, t14, makerShape, infoWind[t12]], $.retain);
     }
   },
   call$0$bailout: function(state0, gooMarker, latLongs, box_0, markerIcon, makerShape, markerIconShadow, divEle, t1, infoWind) {
-    var t3, box_00, vTitle, vDescription, vPhoto, vUserTime, $content, t2, t4, t5, t6, t7, t8, t9;
+    var t3, box_00, vTitle, vDescription, vPhoto, vUserTime, $content, t2, t4, t5, t6, t7, t8;
     t3 = $.getInterceptor$as(t1);
     for (; $.$$lt$n(box_0.i_0, t3.get$length(t1)) === true; box_00 = {}, box_00.i_0 = box_0.i_0, box_00.i_0 = $.$$add$n(box_00.i_0, 1), box_0 = box_00) {
       latLongs.push($.LatLng$($.$$index$as(t3.$index(t1, box_0.i_0), "lat"), $.$$index$as(t3.$index(t1, box_0.i_0), "long"), null));
@@ -8293,7 +8285,7 @@ $$.loadMap_anon = {"": "Closure;data_1",
       vPhoto = $.$$index$as(t3.$index(t1, box_0.i_0), "photo");
       vUserTime = $.$$index$as(t3.$index(t1, box_0.i_0), "time");
       $content = document.createElement("div");
-      $content.set$innerHtml("          <div id=\"news\" style=\"width=5px\">\n          <b>" + $.S(vTitle) + "</b>\n          <p>" + $.S(vDescription) + "</p>\n          <p>" + $.S(vPhoto) + "</p>\n          <b>" + $.S(vUserTime) + "</b>\n          </div>\n          ");
+      $content.set$innerHtml("<div class=\"tabs\">\n  <div class=\"tab\">\n    <input id=\"tab-1\" checked=\"checked\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-1\">Overview</label>\n    <div class=\"content\">\n      <table id=\"infotable\">\n                <tr>\n                  <td colspan=\"2\" id=\"infotitle\">" + $.S(vTitle) + "</td>\n                </tr>\n                <tr>\n                  <td id=\"infotime\">" + $.S(vUserTime) + "</td>\n                  <td rowspan=\"2\" id=\"infodesc\"><div>" + $.S(vDescription) + "</div></td>\n                </tr>\n                <tr>\n                  <td>" + $.S(vPhoto) + "</td>\n                </tr>\n        </table>\n    </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-2\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-2\">Details</label>\n    <div class=\"content\">\n      Details </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-3\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-3\">Photos</label>\n    <div id=\"carousel\"class=\"content\">\n      <div id=\"carousel\">\n      <img src=\"photo1.fw.png\" alt=\"1\">\n      <img src=\"photo2.fw.png\" alt=\"2\">\n      <img src=\"photo3.fw.png\" alt=\"3\">\n      <img src=\"photo4.fw.png\" alt=\"4\">\n      <img src=\"photo5.fw.png\" alt=\"5\">\n      </div>\n    </div>\n  </div>\n  <div class=\"tab\">\n    <input id=\"tab-4\" name=\"tab-group-1\" type=\"radio\"></input>\n    <label for=\"tab-4\">Comments</label>\n    <div class=\"content\">\n      <div>User: </div>\n      <div id=\"opinions\">Comment:</div>\n      <textarea class=\"text\" id=\"comment\" name=\"comment\" placeholder= \"Enter your news comments here\" cols=\"32\" rows=\"5\"></textarea> </div>\n  </div>\n</div>            \n      ");
       divEle.push($content);
       t2 = box_0.i_0;
       if (t2 !== (t2 | 0))
@@ -8303,6 +8295,7 @@ $$.loadMap_anon = {"": "Closure;data_1",
       t2 = divEle[t2];
       t4 = $.InfoWindowOptions$();
       t4.set$content(t2);
+      t4.set$maxWidth(275);
       infoWind.push($.InfoWindow$(t4));
       t2 = $.get$Animation_DROP();
       t5 = $.map;
@@ -8328,28 +8321,21 @@ $$.loadMap_anon = {"": "Closure;data_1",
         throw $.ioore(t2);
       t5 = gooMarker[t2].get$on().get$mouseover();
       t5.add$1(t5, new $.loadMap__anon(box_0, infoWind, gooMarker));
-      t5 = box_0.i_0;
-      if (t5 !== (t5 | 0))
-        throw $.iae(t5);
-      if (t5 < 0 || t5 >= gooMarker.length)
-        throw $.ioore(t5);
-      t6 = gooMarker[t5].get$on().get$mouseout();
-      t6.add$1(t6, new $.loadMap__anon0(box_0, infoWind));
-      t6 = $.map;
-      t8 = box_0.i_0;
-      if (t8 !== (t8 | 0))
-        throw $.iae(t8);
-      if (t8 < 0 || t8 >= gooMarker.length)
-        throw $.ioore(t8);
-      t9 = gooMarker[t8];
-      if (t8 >= infoWind.length)
-        throw $.ioore(t8);
-      $.CONSTANT4.forEach$1([t6, t9, makerShape, infoWind[t8]], $.retain);
+      t5 = $.map;
+      t6 = box_0.i_0;
+      if (t6 !== (t6 | 0))
+        throw $.iae(t6);
+      if (t6 < 0 || t6 >= gooMarker.length)
+        throw $.ioore(t6);
+      t8 = gooMarker[t6];
+      if (t6 >= infoWind.length)
+        throw $.ioore(t6);
+      $.CONSTANT4.forEach$1([t5, t8, makerShape, infoWind[t6]], $.retain);
     }
   }
 };
 
-$$.loadMap__anon1 = {"": "Closure;",
+$$.loadMap__anon0 = {"": "Closure;",
   call$1: function(position) {
     $.scoped(new $.loadMap___anon(position));
   }
@@ -8367,13 +8353,13 @@ $$.loadMap___anon = {"": "Closure;position_2",
   }
 };
 
-$$.loadMap__anon2 = {"": "Closure;",
+$$.loadMap__anon1 = {"": "Closure;",
   call$1: function(error) {
     $.Primitives_printString("Oops, something wrong with geoloation service!");
   }
 };
 
-$$.loadMap__anon3 = {"": "Closure;latlng_3",
+$$.loadMap__anon2 = {"": "Closure;latlng_3",
   call$2: function(results, $status) {
     var t1, t2, t3;
     if ($.$$eq$o($status, $.get$GeocoderStatus_OK()) === true) {
@@ -8396,12 +8382,6 @@ $$.loadMap__anon = {"": "Closure;box_0,infoWind_4,gooMarker_5",
     t1 = this.infoWind_4;
     t2 = this.box_0;
     $.$$index$as(t1, t2.i_0).open$2($.map, $.$$index$as(this.gooMarker_5, t2.i_0));
-  }
-};
-
-$$.loadMap__anon0 = {"": "Closure;box_0,infoWind_6",
-  call$1: function(e) {
-    $.$$index$as(this.infoWind_6, this.box_0.i_0).close$0();
   }
 };
 
@@ -11572,6 +11552,9 @@ $.$defineNativeClass("CSSStyleDeclaration", {"": "length>",
   },
   set$content: function(value) {
     this.setProperty$3("content", value, "");
+  },
+  set$maxWidth: function(value) {
+    this.setProperty$3("max-width", value, "");
   },
   set$position: function(value) {
     this.setProperty$3("position", value, "");

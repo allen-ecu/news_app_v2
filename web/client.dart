@@ -270,22 +270,66 @@ void loadMap(List<Map> data, var MarkerImage) {
       
       //setup info windows
       var content = new DivElement();
+      
       content.innerHtml='''
-          <div id="news" style="width=5px">
-          <b>$vTitle</b>
-          <p>$vDescription</p>
-          <p>$vPhoto</p>
-          <b>$vUserTime</b>
-          </div>
-          ''';
+<div class="tabs">
+  <div class="tab">
+    <input id="tab-1" checked="checked" name="tab-group-1" type="radio"></input>
+    <label for="tab-1">Overview</label>
+    <div class="content">
+      <table id="infotable">
+                <tr>
+                  <td colspan="2" id="infotitle">$vTitle</td>
+                </tr>
+                <tr>
+                  <td id="infotime">$vUserTime</td>
+                  <td rowspan="2" id="infodesc"><div>$vDescription</div></td>
+                </tr>
+                <tr>
+                  <td>$vPhoto</td>
+                </tr>
+        </table>
+    </div>
+  </div>
+  <div class="tab">
+    <input id="tab-2" name="tab-group-1" type="radio"></input>
+    <label for="tab-2">Details</label>
+    <div class="content">
+      Details </div>
+  </div>
+  <div class="tab">
+    <input id="tab-3" name="tab-group-1" type="radio"></input>
+    <label for="tab-3">Photos</label>
+    <div id="carousel"class="content">
+      <div id="carousel">
+      <img src="photo1.fw.png" alt="1">
+      <img src="photo2.fw.png" alt="2">
+      <img src="photo3.fw.png" alt="3">
+      <img src="photo4.fw.png" alt="4">
+      <img src="photo5.fw.png" alt="5">
+      </div>
+    </div>
+  </div>
+  <div class="tab">
+    <input id="tab-4" name="tab-group-1" type="radio"></input>
+    <label for="tab-4">Comments</label>
+    <div class="content">
+      <div>User: </div>
+      <div id="opinions">Comment:</div>
+      <textarea class="text" id="comment" name="comment" placeholder= "Enter your news comments here" cols="32" rows="5"></textarea> </div>
+  </div>
+</div>            
+      ''';
+
       divEle.add(content);
       
       var infoWindow = new InfoWindow(
           new InfoWindowOptions()
           ..content = divEle[i]
+          ..maxWidth = 275    
       );
-      infoWind.add(infoWindow);
       
+      infoWind.add(infoWindow);
       
       //set markers
       var marker = new Marker(new MarkerOptions()
@@ -306,9 +350,9 @@ void loadMap(List<Map> data, var MarkerImage) {
       });
       
       //set mouseout trigger contents window closed
-      gooMarker[i].on.mouseout.add((e) {
-        infoWind[i].close();
-      });
+      //gooMarker[i].on.mouseout.add((e) {
+        //infoWind[i].close();
+      //});
       
       //keep objects live
       jsw.retainAll([map, gooMarker[i], makerShape, infoWind[i]]); 
