@@ -1,8 +1,8 @@
 //Configuration
 part of client;
 
-final HOST = "127.0.0.1"; // eg: localhost 
-final PORT = 8080; 
+final HOST = "10.1.1.3"; // eg: localhost 
+final PORT = 5050; 
 
 
 //URI mapping

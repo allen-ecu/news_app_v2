@@ -6,20 +6,22 @@ import 'dart:html';
 import 'dart:json' as Json;
 import 'dart:async';
 import 'dart:uri';
-
 import 'package:google_maps/js_wrap.dart' as jsw;
-import 'package:google_maps/google_maps.dart';
+import 'package:google_maps/google_maps.dart' as gm;
 import 'package:js/js.dart' as js;
 
 part 'config.dart';
 
-GMap map;
-Geocoder geocoder;
+gm.GMap map;
+gm.Geocoder geocoder;
 
-final LatLng centre = jsw.retain(new LatLng(-29.5,132.1));
+final gm.LatLng centre = jsw.retain(new gm.LatLng(-29.5,132.1));
 //var uriXML = 'news.xml';
 final markerImg = 'markerImg.png';
 final markerShadow = 'markerShadow.png';
+final int widthIMG = 63;
+final int heightIMG = 63;
+
 InputElement usrTitle= query('#title');
 TextAreaElement usrDesc = query('#description');
 InputElement usrPhoto = query('#photo');
@@ -34,6 +36,9 @@ String ip = 'none';
 num lat = 0;
 num long = 0;
 var uri = 'news.json';
+dynamic data;
+final num n_pho = 4;
+num index = 0;
 
 void main() {
   
@@ -45,13 +50,163 @@ void main() {
   //.then(processString)
   //.whenComplete(complete)
   //.catchError(handleError);
-
+  
+  //validate title input
+  query('#title').onKeyPress.listen((e){
+  validNumLett(e);
+  });
+  
+  //validate description input
+  query('#description').onKeyPress.listen((e){
+  validNumLett(e);
+  });
+  
+  //get image from users
+  InputElement uploadInput = query('#photo');
+  getIMAGE(uploadInput);
+  
+  /*
+  query('#photo2').onMouseOver.listen((e){
+    drawCross(e);
+  });
+  query('#photo3').onMouseOver.listen((e){
+    drawCross(e);
+  });
+  query('#photo4').onMouseOver.listen((e){
+    drawCross(e);
+  });
+  */
+  //draggable event
+  
   //submit user input(JSON) to the server
   query('#submit').onClick.listen((e){
   ajaxSendJSON();
   ajaxGetJSON();
   });
   
+}
+
+void getIMAGE(InputElement uploadInput) {
+  uploadInput.onChange.listen((e){
+  
+    if(index < n_pho)
+    {
+      final files = uploadInput.files;
+      if (files.length == 1) {
+        final file = files[0];
+        final reader = new FileReader();
+        reader.onLoad.listen((e) {
+          data = reader.result;
+          //print image data
+          print(data);
+          showIMG('#photo$index');
+        });
+        reader.readAsDataUrl(file);
+      }
+    }
+    if(index == 3)
+    {
+      query('#photo').hidden = true;
+    }
+    index++;
+  });
+}
+
+void drawCross(e){
+  print('#${e.target.id}'); 
+ 
+  CanvasElement canvas = query('#${e.target.id}');
+  var context = canvas.context2d;
+  //query('#can1').append(canvas);
+  canvas.height = widthIMG;
+  canvas.width = heightIMG;
+  
+  //draw red cross
+  //context.clearRect(0,0,widthIMG,heightIMG);
+  context.strokeStyle = '#ff0000';
+  context.beginPath();
+  context.moveTo(0, 0);
+  context.lineTo(63, 63);
+  context.moveTo(63, 0);
+  context.lineTo(0, 63);
+  context.closePath();
+  context.stroke();
+  
+}
+
+void drawIMG(iD, ImageElement img) {
+  CanvasElement canvas = query(iD);
+  var context = canvas.context2d;
+  canvas.height = widthIMG;
+  canvas.width = heightIMG;
+  context.drawImage(img, 0,0);
+}
+
+//show uploaded image
+//show red border when mouse over
+//swap images by drag and drop
+void showIMG(var iD) {
+  
+  var sub = iD.substring(6);
+  ImageElement old = new ImageElement();
+  
+  //show red border when mouse over
+  showRedBorder(id){
+    query('#IMG_$id').classes.remove('greyborder');
+    query('#IMG_$id').classes.add('redborder');
+  }
+  //show grey border when mouse out
+  showGreyBorder(id){
+    query('#IMG_$id').classes.remove('redborder');
+    query('#IMG_$id').classes.add('greyborder');
+  }
+  
+  void dragf(MouseEvent e) {
+    //send src and id of photo upon dragging
+    ImageElement dragP = e.target;
+    e.dataTransfer.setData('Src', dragP.src);
+    e.dataTransfer.setData('Text', dragP.id);
+  }
+  
+  void dropf(MouseEvent e) {
+    e.preventDefault();
+    //receive src and id of photo dragged
+    var dragSrc = e.dataTransfer.getData('Src');
+    var dragID = e.dataTransfer.getData('Text');
+    //save src of photo to drop
+    ImageElement drop = e.target;
+    old.src = drop.src;
+    //change the photo to drop to new src
+    drop.src= dragSrc;
+    //change the photo dragged to src of dropped photo
+    ImageElement dragPP = query('#$dragID');
+    dragPP.src = old.src;
+  }
+    
+  var img = new ImageElement()
+  ..id = 'IMG_$sub'
+  ..src = data
+  ..draggable = true
+  ..width = widthIMG
+  ..height = heightIMG
+  ..onMouseOut.listen((e) => showGreyBorder(sub))
+  ..onMouseOver.listen((e) => showRedBorder(sub))
+  ..onDragStart.listen((e) => dragf(e))
+  ..onDragOver.listen((e) => e.preventDefault())
+  ..onDrop.listen((e) => dropf(e));
+  
+  query(iD).replaceWith(img);
+}
+
+void validNumLett(KeyboardEvent e) {
+  String v = new String.fromCharCode(e.keyCode);
+  //a-zA-Z ,. \t "space" \r "enter"
+  RegExp exp = new RegExp('[A-Za-z0-9 \x08\t\r.,]');
+  if(!exp.hasMatch(v))
+  {
+    e.returnValue = false;
+    e.preventDefault();
+  }
 }
 
 loadEnd(HttpRequest request) {
@@ -64,39 +219,75 @@ loadEnd(HttpRequest request) {
 
 void ajaxSendJSON()
 {
- HttpRequest request = new HttpRequest(); // create a new XHR
+  String status = mapTOJSON();
   
-  // add an event handler that is called when the request finishes
-  request.onReadyStateChange.listen((_) 
-      {
-    if (request.readyState == HttpRequest.DONE &&
-        (request.status == 200 || request.status == 0)) {
-      // data saved OK.
-      print(request.responseText); // output the response from the server
+  if(!(status == 'false'))
+  {
+    var elem = new LabelElement();
+    elem.id = 'ok';
+    elem.text = 'Message Successfully Sent!';
+    if(query('#error')!=null)
+    {
+      query('#error').replaceWith(elem);
+    }
+    if(query('#info')!=null)
+    {
+    query('#info').replaceWith(elem);
+    }
+    
+    HttpRequest request = new HttpRequest(); // create a new XHR
+    // add an event handler that is called when the request finishes
+    request.onReadyStateChange.listen((_) 
+        {
+      if (request.readyState == HttpRequest.DONE &&
+          (request.status == 200 || request.status == 0)) {
+        // data saved OK.
+        print(request.responseText); // output the response from the server
       }
                                                          }
-  );
-  // POST the data to the server
-  var url = "/send";
-  request.open("POST", url, true);
-  request.setRequestHeader("Content-Type", "application/json");
-  request.send(mapTOJSON()); // perform the async POST
-  //request.onLoadEnd.listen((e) => loadEnd(request));
+      );
+    // POST the data to the server Async
+    var url = "/send";
+    request.open("POST", url);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send(status);
+  }
+  else
+  {
+    var elem = new LabelElement();
+    elem.id = 'error';
+    elem.text = 'Please enter the title, description, and time!';
+    if(query('#ok')!=null)
+    {
+      query('#ok').replaceWith(elem);
+    }
+    if(query('#info')!=null)
+    {
+    query('#info').replaceWith(elem);
+    }
+  }
 }
 
 String mapTOJSON()
 {
-  var obj = new Map();
-  obj['title'] = usrTitle.value==null? "none":usrTitle.value;
-  obj['description'] = usrDesc.value==null? "none":usrDesc.value;
-  obj['photo'] = usrPhoto.value=="none";
-  obj['time'] = usrTime==null? "none":usrTime.value; 
-  obj['ip']= ip;
-  obj['lat'] = double.parse(window.localStorage['Lat']);
-  obj['long'] = double.parse(window.localStorage['Lng']);
-  //obj["ip"] = usrTime==null? "none":usrTime; 
-  print('Sending JSON to the server...');
-  return Json.stringify(obj); // convert map to String i.e. JSON
+  if(usrTitle.value.isEmpty || usrDesc.value.isEmpty || usrTime.value.isEmpty)
+  {
+    return 'false';
+  }
+  else
+  {
+    var obj = new Map();
+    obj['title'] = usrTitle.value.isEmpty? "none":usrTitle.value;
+    obj['description'] = usrDesc.value.isEmpty? "none":usrDesc.value;
+    obj['photo'] = usrPhoto.value.isEmpty? "none":usrPhoto.value;
+    obj['time'] = usrTime.value.isEmpty? curTime:usrTime.value; 
+    obj['ip']= ip;
+    obj['lat'] = double.parse(window.localStorage['Lat']);
+    obj['long'] = double.parse(window.localStorage['Lng']);
+    //obj["ip"] = usrTime==null? "none":usrTime; 
+    print('Sending JSON to the server...');
+    return Json.stringify(obj); // convert map to String i.e. JSON
+  }
 }
 
 /*
@@ -195,7 +386,7 @@ void loadMap(List<Map> data, var MarkerImage) {
     if (window.navigator.geolocation != null) {
       window.navigator.geolocation.getCurrentPosition().then((position) {
         js.scoped(() {
-          var pos = new LatLng(position.coords.latitude,position.coords.longitude);
+          var pos = new gm.LatLng(position.coords.latitude,position.coords.longitude);
           window.localStorage['Lat'] =pos.lat.toString();
           window.localStorage['Lng'] =pos.lng.toString();
         });
@@ -207,15 +398,15 @@ void loadMap(List<Map> data, var MarkerImage) {
     }
     
     //Get geographic address from Latitude and Longitude:
-    geocoder = jsw.retain(new Geocoder());
-    final LatLng latlng = jsw.retain(new LatLng(double.parse(window.localStorage['Lat']), double.parse(window.localStorage['Lng'])));
-    final request = new GeocoderRequest()
+    geocoder = jsw.retain(new gm.Geocoder());
+    final gm.LatLng latlng = jsw.retain(new gm.LatLng(double.parse(window.localStorage['Lat']), double.parse(window.localStorage['Lng'])));
+    final request = new gm.GeocoderRequest()
       ..location = latlng  // TODO bad variable "latlng" in example code
       ;
     
     //call geocoder to fetch address:
-    geocoder.geocode(request, (List<GeocoderResult> results, GeocoderStatus status) {
-      if (status == GeocoderStatus.OK) {
+    geocoder.geocode(request, (List<gm.GeocoderResult> results, gm.GeocoderStatus status) {
+      if (status == gm.GeocoderStatus.OK) {
         if (results[0] != null) {
           jsw.release(latlng);
           window.localStorage['Address'] = results[0].formattedAddress;
@@ -230,37 +421,37 @@ void loadMap(List<Map> data, var MarkerImage) {
     //Google map:
     
     //set map options
-    final mapOptions = new MapOptions()
+    final mapOptions = new gm.MapOptions()
       ..zoom = 4
       ..center = centre
-      ..mapTypeId = MapTypeId.ROADMAP
+      ..mapTypeId = gm.MapTypeId.ROADMAP
       ;
     
     //var myLayer = new GLayer("org.wikipedia.en");
-    map = jsw.retain(new GMap(query("#mapholder"), mapOptions));
+    map = jsw.retain(new gm.GMap(query("#mapholder"), mapOptions));
     
     //set clickable area
-    var makerShape = new MarkerShape();
+    var makerShape = new gm.MarkerShape();
     makerShape.coords = [20,6,22,7,23,8,24,9,25,10,25,11,25,12,25,13,25,14,25,15,25,16,25,17,25,18,25,19,24,20,23,21,22,22,20,23,19,24,8,24,5,23,4,22,4,21,4,20,4,19,10,18,9,17,8,16,8,15,7,14,7,13,7,12,8,11,8,10,8,9,9,8,10,7,11,6,20,6];
-    makerShape.type = MarkerShapeType.POLY;
+    makerShape.type = gm.MarkerShapeType.POLY;
     
     //set marker icon
-    final markerIcon = new Icon()
+    final markerIcon = new gm.Icon()
     ..url = markerImg;
     
-    final markerIconShadow = new Icon()
+    final markerIconShadow = new gm.Icon()
     ..url = markerShadow;
    
     //set popup contents
     List<DivElement> divEle= new List<DivElement>();
-    List<InfoWindow> infoWind= new List<InfoWindow>();
-    List<Marker> gooMarker= new List<Marker>();
-    List<LatLng> latLongs = new List<LatLng>();
+    List<gm.InfoWindow> infoWind= new List<gm.InfoWindow>();
+    List<gm.Marker> gooMarker= new List<gm.Marker>();
+    List<gm.LatLng> latLongs = new List<gm.LatLng>();
     
     for (int i = 0; i< data.length; i++)
     {
       //setup all lat long coordinates
-      LatLng latlong = new LatLng(data[i]['lat'],data[i]['long']);
+      gm.LatLng latlong = new gm.LatLng(data[i]['lat'],data[i]['long']);
       latLongs.add(latlong);
       
       String vTitle = data[i]['title'];
@@ -323,8 +514,8 @@ void loadMap(List<Map> data, var MarkerImage) {
 
       divEle.add(content);
       
-      var infoWindow = new InfoWindow(
-          new InfoWindowOptions()
+      var infoWindow = new gm.InfoWindow(
+          new gm.InfoWindowOptions()
           ..content = divEle[i]
           ..maxWidth = 275    
       );
@@ -332,12 +523,12 @@ void loadMap(List<Map> data, var MarkerImage) {
       infoWind.add(infoWindow);
       
       //set markers
-      var marker = new Marker(new MarkerOptions()
+      var marker = new gm.Marker(new gm.MarkerOptions()
       ..position = latLongs[i] //ip address
       ..map = map
       ..draggable = false
       ..shape = makerShape
-      ..animation = Animation.DROP
+      ..animation = gm.Animation.DROP
       ..icon = markerIcon
       ..shadow = markerIconShadow
       );
@@ -369,10 +560,10 @@ void ajaxGetJSON(){
 }
 
 // analysing json data sent from server
-void onDataLoaded(String responseText) {
-  var news = Json.parse(responseText);
+void onDataLoaded(String response) {
+  var news = Json.parse(response);
   print('client: received json:');
-  print('responseText $responseText');
+  print('responseText $response');
   print('Json.parse $news');
   
   assert(news is List);
@@ -386,6 +577,4 @@ void onDataLoaded(String responseText) {
   lat = firstNews['lat'];
   long = firstNews['long'];
   ip = firstNews['ip'];
-  print(title);
-  print('analysing okay...');
 }

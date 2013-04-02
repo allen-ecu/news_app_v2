@@ -19,7 +19,7 @@ void serverInfo(HttpConnect connect){
   
   if(request.uri.path == '/send' && request.method == 'POST')
   {    
-    response.addString('Welcome from the server!');
+    response.write('Welcome from the server!');
     
     //convert from ASCII decimal to char
     convertASCII(int key)
@@ -30,9 +30,9 @@ void serverInfo(HttpConnect connect){
     
     printAll()
     {
-      //convert json data to Stri
+      //convert json data to String
       StringBuffer sb = new StringBuffer();
-      result.forEach((String key)=>sb.add(key));
+      result.forEach((String key)=>sb.write(key));
       String res = sb.toString();
       //{"title":"kjk","photo":false,"time":"2013-02-28T11:11","description":"jkjk","ip":"191.23.3.1","lat":"none","long":"none"}
       print(res);
@@ -75,13 +75,13 @@ void serverInfo(HttpConnect connect){
     });
     
     //raw.forEach((int key)=>response.addString(new String.fromCharCode(key)));
-    response.addString(' Received Content Length of: ');
-    response.addString(request.contentLength.toString());
+    response.write(' Received Content Length of: ');
+    response.write(request.contentLength.toString());
 
   }
   else
   {
-    response.addString('<a href=\'\\\'>Oops!Let us go home!</a>');
+    response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
     connect.close();
@@ -98,7 +98,7 @@ void clientInfo(HttpConnect connect) {
     
   File jsonDoc = new File('JSON.json');
   //use Sync method
-  String data = jsonDoc.readAsStringSync(Encoding.UTF_8);
+  String data = jsonDoc.readAsStringSync();
 
   //Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
   //onFinished.then((stringData) => output = stringData);
@@ -106,11 +106,11 @@ void clientInfo(HttpConnect connect) {
 
   connect.response
     ..headers.contentType = contentTypes["application/json"]
-    ..addString('[$data]');
+    ..write('[$data]');
   }
   else
   {
-    response.addString('<a href=\'\\\'>Oops!Let us go home!</a>');
+    response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
     connect.close();

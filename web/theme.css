@@ -41,7 +41,7 @@ b {
 .sidebar {
   position: absolute; 
   width: 400px;
-  min-height: 214px; 
+  min-height: 275px; 
   margin-top: 20px;
   margin-left:10px;
   margin-bottom: 20px;
@@ -51,24 +51,21 @@ b {
 .news {
   position: absolute; 
   width: 400px;
-  min-height: 228px; 
-  margin-top: 315px;
+  min-height: 198px; 
+  margin-top: 416px;
   margin-left:10px;
   margin-bottom: 20px;
   background-color: #fff;
   border: thin solid #C0C0C0;
 }
 .body {
-  min-height: 460px; 
+  min-height: 593px; 
   margin-left: 420px;
   margin-right: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   background-color: #fff;
   border: thin solid #C0C0C0;
-}
-input {
-width:287px;
 }
 label {
 width:50px;
@@ -83,7 +80,7 @@ table {
 }
 div #mapholder {
     width: auto;
-    height: 420px;
+    height: 485px;
     position:relative;
     margin:10px;
     padding: 10px;
@@ -99,6 +96,16 @@ tr td {
 td div {
   font-size: 85%;
   }
+tr input {
+  width:286px;
+}
+tr textarea {
+  width:286px;
+}
+tr #info {
+  width:286px;
+}
+
 /*overview tab */
 #infotitle {
   height: 33px;
@@ -297,4 +304,25 @@ td div {
   -moz-animation-delay: 0;
   -o-animation-delay: 0;
   animation-delay: 0;
+}
+#error {
+ color: #FF4400;
+ font-size: small;
+}
+#ok {
+ color: #00CC66;
+ font-size: small;
+}
+#photo1,#photo2,#photo3,#photo4 {
+ width:63px;
+ height:63px;
+ display: inline-block;
+}
+td img {
+ border: 1px solid #C0C0C0;
+ padding: 2px;
+ margin-right: 4px;
+}
+.redborder {
+ border: 1px solid #FF0000;
 }

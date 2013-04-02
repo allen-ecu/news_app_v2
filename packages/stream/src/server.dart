@@ -3,17 +3,6 @@
 // Author: tomyeh
 part of stream;
 
-/** The filter. It is used with the `filterMapping` parameter of [StreamServer].
- *
- * * [chain] - the callback to *resume* the request handling. If there is another filter,
- * it will be invoked when you call back [chain]. If you'd like to skip the handling (e.g., redirect to another page),
- * you don't have to call back [chain].
- *
- * Before calling back [chain], you can proxy the request and/or response, such as writing the
- * the response to a string buffer.
- */
-typedef void Filter(HttpConnect connect, void chain(HttpConnect conn));
-
 /** Converts the given value to a non-null string.
  * If the given value is not null, `toString` is called.
  * If null, an empty string is returned.
@@ -53,10 +42,16 @@ abstract class StreamServer {
    * (i.e., `void`). If not, it shall return an URI (which is a non-empty string,
    * starting with * `/`) that the request shall be forwarded to.
    *
-   * * [uriMapping] - a map of URI mappings, `<String uri, Function handler>`.  The URI is
-   * a regular exception used to match the request URI.
-   * * [filterMapping] - a map of filter mapping, `<String uri, Function filter>`. The signature
-   * of a filter is `void foo(HttpConnect connect, void chain(HttpConnect conn))`.
+   * * [uriMapping] - a map of URI mappings, `<String uri, RequestHandler handler>`
+   * or `<String uri, String forwardURI>`.
+   * The key is a regular exception used to match the request URI.
+   * The value can be the handler for handling the request, or another URI that this request
+   * will be forwarded to. If the value is a URI and the key has named groups, the URI can
+   * refer to the group with the $ expression.
+   * For example: `'/dead-link(info:.*)': '/new-link$info'`.
+   * * [filterMapping] - a map of filter mapping, `<String uri, RequestFilter filter>`.
+   * The key is a regular exception used to match the request URI.
+   * The signature of a filter is `void foo(HttpConnect connect, void chain(HttpConnect conn))`.
    * * [errorMapping] - a map of error mapping. The key can be a number, an instance of
    * exception, a string representing a number, or a string representing the exception class.
    * The value can be an URI or a renderer function. The number is used to represent a status code,
@@ -64,10 +59,18 @@ abstract class StreamServer {
    * Notice that, if you specify the name of the exception to handle,
    * it must include the library name and the class name, such as `"stream.ServerError"`.
    */
-  factory StreamServer({Map<String, Function> uriMapping,
-    Map errorMapping, Map<String, Filter> filterMapping,
-    String homeDir, LoggingConfigurer loggingConfigurer})
-  => new _StreamServer(uriMapping, errorMapping, filterMapping, homeDir, loggingConfigurer);
+  factory StreamServer({Map<String, dynamic> uriMapping,
+      Map errorMapping, Map<String, RequestFilter> filterMapping,
+      String homeDir, LoggingConfigurer loggingConfigurer})
+  => new _StreamServer(new DefaultRouter(uriMapping, errorMapping, filterMapping),
+      homeDir, loggingConfigurer);
+
+  /** Constructs a server with the given router.
+   * It is used if you'd like to use your own router, rather than the default one.
+   */
+  factory StreamServer.router(Router router, {String homeDir,
+      LoggingConfigurer loggingConfigurer})
+  => new _StreamServer(router, homeDir, loggingConfigurer);
 
   /** The version.
    */
@@ -131,7 +134,7 @@ abstract class StreamServer {
    * * The request handler that invokes [forward] shall not call `connect.close` (it is the job
    * of the callee -- the forwarded request handler).
    */
-  void forward(HttpConnect connect, String uri, {Handler success,
+  void forward(HttpConnect connect, String uri, {VoidCallback success,
     HttpRequest request, HttpResponse response});
   /** Includes the given [uri].
    * If you'd like to include a request handler (i.e., a function), use [connectForInclusion]
@@ -153,7 +156,7 @@ abstract class StreamServer {
    * * The request handler that invokes [forward] shall not call `connect.close` (it is the job
    * of the callee -- the included request handler).
    */
-  void include(HttpConnect connect, String uri, {Handler success,
+  void include(HttpConnect connect, String uri, {VoidCallback success,
     HttpRequest request, HttpResponse response});
   /** Gets the HTTP connect for inclusion.
    * If you'd like to include from URI, use [include] instead.
@@ -161,7 +164,7 @@ abstract class StreamServer {
    *
    *     fooHandler(connectForInclusion(connect, success: () {continueToDo();}));
    */
-  HttpConnect connectForInclusion(HttpConnect connect, {String uri, Handler success,
+  HttpConnect connectForInclusion(HttpConnect connect, {String uri, VoidCallback success,
     HttpRequest request, HttpResponse response});
 
   /** The resource loader used to load the static resources.
@@ -172,11 +175,32 @@ abstract class StreamServer {
 
   /** The application-specific error handler. Default: null.
    */
-  void onError(ConnectErrorHandler handler);
+  void onError(ConnectErrorCallback handler);
   /** The default content handler. It is invoked after the handler assigned
    * to [onError], if any.
    */
-  ConnectErrorHandler get defaultErrorHandler;
+  ConnectErrorCallback get defaultErrorCallback;
+
+  /** Maps the given URI to the given handler.
+   *
+   * * [uri] - a regular exception used to match the request URI.
+   * * [handler] - the handler for handling the request, or another URI that this request
+   * will be forwarded to. If the value is a URI and the key has named groups, the URI can
+   * refer to the group with the $ expression.
+   * For example: `'/dead-link(info:.*)': '/new-link$info'`.
+   * if [handler] is null, it means removal.
+   * * [preceding] - whether to make the mapping preceding any previous mappings.
+   * In other words, if true, this mapping will be interpreted first.
+   */
+  void map(String uri, handler, {preceding: false});
+  /** Maps the given URI to the given filter.
+   *
+   * * [uri]: a regular exception used to match the request URI.
+   * * [filter]: the filter. If null, it means removal.
+   * * [preceding] - whether to make the mapping preceding any previous mappings.
+   * In other words, if true, this mapping will be interpreted first.
+   */
+  void filter(String uri, RequestFilter filter, {preceding: false});
 
   /** The logger for logging information.
    * The default level is `INFO`.

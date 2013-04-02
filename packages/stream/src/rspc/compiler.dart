@@ -133,10 +133,17 @@ class Compiler {
       if (sourceName == null || sourceName.isEmpty)
         _error("The page tag with the name attribute is required", line);
 
-      final i = sourceName.lastIndexOf('/') + 1,
-        j = sourceName.indexOf('.', i);
-      _name = StringUtil.camelize(
-        j >= 0 ? sourceName.substring(i, j): sourceName.substring(i));
+      _name = new Path(sourceName).filename;
+      var i = _name.indexOf('.');
+      _name = StringUtil.camelize(i < 0 ? _name: _name.substring(0, i));
+
+      for (i = _name.length; --i >= 0;) { //check if _name is legal
+        final cc = _name[i];
+        if (!StringUtil.isChar(cc, upper:true, lower: true, digit: true)
+            && cc != '\$' && cc != '_')
+          _error("Unable to generate a legal function name from $sourceName. "
+            "Please specify the name with the page tag.", line);
+      }
     }
 
     if (verbose) _info("Generate $_name from line $line");
@@ -159,11 +166,18 @@ class Compiler {
       imports.addAll(_import.split(','));
 
     if (_partOf == null || _partOf.isEmpty) { //independent library
-      final i = sourceName.lastIndexOf('.'),
-        j = sourceName.lastIndexOf('/'),
-        lib = i >= 0 && i > j ? sourceName.substring(j >= 0 ? j + 1: 0, i):
-            j >= 0 ? sourceName.substring(j + 1): sourceName;
-      _writeln("library ${lib.replaceAll('.', '_')};\n");
+      var lib = new Path(sourceName).filename;
+      var i = lib.lastIndexOf('.'); //remove only one extension
+      if (i >= 0) lib = lib.substring(0, i);
+
+      final sb = new StringBuffer(), len = lib.length;
+      for (i = 0; i < len; ++i) {
+        final cc = lib[i];
+        sb.write(StringUtil.isChar(cc, upper:true, lower: true, digit: true)
+            || cc == '\$' ? cc: '_');
+      }
+      _writeln("library $sb;\n");
+
       for (final impt in imports)
         _writeln("import ${_toImport(impt)};");
     } else if (_partOf.endsWith(".dart")) { //needs to maintain the given dart file
@@ -303,17 +317,22 @@ class Compiler {
           if (c2 == '=') { //[=exprssion]
             _pos = j + 1;
             return new _Expr();
-          } else if (c2 == '/') { //[/closing-tag]
+          } else if (c2 == ':' || c2 == '/') { //[:beginning-tag] or [/closing-tag]
             int k = j + 1;
             if (k < _len && StringUtil.isChar(source[k], lower:true)) {
               int m = _skipId(k);
               final tagnm = source.substring(k, m);
               final tag = tags[tagnm];
-              if (tag != null && m < _len && source[m] == ']') { //tag found
-                if (!tag.hasClosing)
-                  _error("[/$tagnm] not allowed. It doesn't need the closing tag.", _line);
-                _pos = m + 1;
-                return new _Closing(tagnm);
+              if (tag != null) {
+                if (c2 == ':') { //beginning of tag
+                  _pos = m;
+                  return tag;
+                } else if (m < _len && source[m] == ']') { //ending of tag found
+                  if (!tag.hasClosing)
+                    _error("[/$tagnm] not allowed. It doesn't need the closing tag.", _line);
+                  _pos = m + 1;
+                  return new _Closing(tagnm);
+                }
               }
             }
             //fall through
@@ -323,12 +342,11 @@ class Compiler {
               continue;
             }
           } else if (StringUtil.isChar(c2, lower:true)) { //[beginning-tag]
+          //deprecated (TODO: remove later)
             int k = _skipId(j);
-            final tag = tags[source.substring(j, k)];
-            if (tag != null) { //tag found
-              _pos = k;
-              return tag;
-            }
+            final tn = source.substring(j, k), tag = tags[tn];
+            if (tag != null) //tag found
+              _warning("[$tn] is deprecated and ignored. Please use [:$tn] instead.", _line);
             //fall through
           }
         }

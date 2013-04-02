@@ -9,7 +9,7 @@ void home(HttpConnect connect) { //4
   if (!connect.isIncluded)
     response.headers.contentType = new ContentType.fromString("""text/html; charset=utf-8""");
 
-  response.addString("""
+  response.write("""
 
 <!DOCTYPE html>
 <html>
@@ -31,16 +31,17 @@ void home(HttpConnect connect) { //4
   <h2>News Updater</h2>
   
   <table>
-    <tr><td><label>Title</label></td><td><input class="text" id="title" name="title" placeholder= "Enter your news title here" autofocus="true"/></td></tr>
-    <tr><td><label>Description</label></td><td><textarea class="text" id="description" name="description" placeholder= "Enter your news description here" cols="38" rows="5"></textarea></td></tr>
-    <tr><td><label>Photo</label></td><td><input type="file" id="photo" name="photo" accept="image/*"/></td></tr>
-    <tr><td><label>Date</label></td><td><input type="datetime-local" id="time" name="time"/></td></tr>
-    <tr><td><button id="submit">Submit</button></td></tr>
+    <tr><td><label>Title</label></td><td><input class="text" id="title" name="title" placeholder= "Enter your news title here" required="required" autofocus="true"/></td></tr>
+    <tr><td><label>Description</label></td><td><textarea class="text" id="description" name="description" maxlength="175" required="required" placeholder= "Enter your news description here" cols="38" rows="5"></textarea></td></tr>
+    <tr><td><label>Photo</label></td><td><input type="file" id="photo" name="photo" required="required" accept="image/*"/></td></tr>
+    <tr><td><label>Preview</label></td><td><img id="photo1" draggable="true" class="greyborder" alt="Photo 1"></img><img id="photo2" draggable="true" alt="Photo 2"></img><img id="photo3" draggable="true" alt="Photo 3"></img><img id="photo4" sdraggable="true" alt="Photo 4"></img></td></tr>    
+    <tr><td><label>Date</label></td><td><input type="datetime-local" id="time" name="time" required="required"/></td></tr>
+    <tr><td><button id="submit">Submit</button></td><td id="info"></td></tr>
   </table>
   
   </div>
   
-  <div class="news">
+  <div id="news" class="news">
   <h2>Lastest News</h2>
   </div>
   

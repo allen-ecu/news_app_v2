@@ -25,7 +25,7 @@ class NewsInfo {
 
 void main() {
   new StreamServer(uriMapping: _mapping, errorMapping: _errormapping)
-  ..port = 8080
-  ..host = '127.0.0.1'
+  ..port = 5050
+  ..host = '10.1.1.3'
   ..start();
 }

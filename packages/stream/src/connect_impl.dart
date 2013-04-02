@@ -5,9 +5,9 @@ part of stream;
 
 ///Skeletal implementation
 abstract class _AbstractConnect implements HttpConnect {
-  final ConnectErrorHandler _cxerrh;
-  ErrorHandler _errh;
-  Handler _close;
+  final ConnectErrorCallback _cxerrh;
+  ErrorCallback _errh;
+  VoidCallback _close;
   Map<String, dynamic> _dataset;
   final _StreamTarget<HttpConnect> _closeEvtTarget = new _StreamTarget<HttpConnect>();
   _StreamTarget _errEvtTarget;
@@ -40,18 +40,18 @@ abstract class _AbstractConnect implements HttpConnect {
   bool get isForwarded => false;
 
   @override
-  void forward(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void forward(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     server.forward(this, uri, success: success, request: request, response: response);
   }
   @override
-  void include(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void include(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     server.include(this, uri, success: success, request: request, response: response);
   }
 
   @override
-  Handler get close => _close;
+  VoidCallback get close => _close;
   @override
-  ErrorHandler get error => _errh;
+  ErrorCallback get error => _errh;
   @override
   Stream<HttpConnect> get onClose => _provider.forTarget(_closeEvtTarget);
   @override
@@ -63,7 +63,7 @@ abstract class _AbstractConnect implements HttpConnect {
 ///The default implementation of HttpConnect
 class _HttpConnect extends _AbstractConnect {
   _HttpConnect(StreamServer server, HttpRequest request, HttpResponse response):
-      this.server = server, super(request, response, server.defaultErrorHandler);
+      this.server = server, super(request, response, server.defaultErrorCallback);
 
   @override
   final StreamServer server;
@@ -79,7 +79,7 @@ class _ProxyConnect extends _AbstractConnect {
 
   ///[uri]: if null, it means no need to change
   _ProxyConnect(HttpConnect origin, HttpRequest request, HttpResponse response):
-      _origin = origin, super(request, response, origin.server.defaultErrorHandler);
+      _origin = origin, super(request, response, origin.server.defaultErrorCallback);
 
   @override
   StreamServer get server => _origin.server;
@@ -148,14 +148,11 @@ class _IncludedResponse extends HttpResponseWrapper {
 
   HttpHeaders _headers;
 
+  //Note: we don't override set:statusCode since we have to report the error
+  //back to the browser if it happens in the included renderer
+
   @override
   void set contentLength(int contentLength) {
-  }
-  @override
-  void set statusCode(int statusCode) {
-  }
-  @override
-  void set reasonPhrase(String reasonPhrase) {
   }
 
   @override
@@ -215,7 +212,7 @@ HttpResponse _wrapResponse(HttpResponse response, bool included)
 
 //Close and error stream (for implementing HttpConnect.onClose and onError)
 class _StreamTarget<T> implements StreamTarget<T> {
-  Queue<Function> _listeners;
+  List<Function> _listeners;
 
   _StreamTarget();
 
@@ -228,8 +225,8 @@ class _StreamTarget<T> implements StreamTarget<T> {
   @override
   void addEventListener(String type, void listener(T event)) {
     if (_listeners == null)
-      _listeners = new Queue();
-    _listeners.addFirst(listener);
+      _listeners = [];
+    _listeners.insert(0, listener);
   }
   @override
   void removeEventListener(String type, void listener(T event)) {

@@ -1,4 +1,39 @@
 Change Log:
+V2.6
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+1.upload photos to the server
+2.refine the json format
+3.validate the users input before submt
+
+Next:
+-------------------------------
+Retrieve the JSON data from the server.
+Upload photo to server.
+Get IP address from user.
+Save date to WebDB or IndexedDB
+Load news from DB and send to client
+
+What has changed?
+-------------------------------
+Customized InfoWindow, put css photo carosoul, comment, and more details.
+When the users submit the data, the lat,lnt coordinates will be sent to the server as well
+Changed to new marker icons
+The server now can save the data using Sync read method.
+The client can receive the json data from the server
+Steam upgraded to v0.6.2
+Dart Editor 0.4.3_r20602
+Dat SDK 0.4.3.5_r26062
+The localhost has changed to 10.1.1.11:5050 for testing in my case.
+You must use r20602 version and Stream v0.6.2 to in order to run the codes correctly.
+
+Versions:
+-------------------------------
+Last Version: V2.5
+This Version: V2.6
+
+Change Log:
 V2.5
 ------------------------------------------------------------------
 What to Fix:
@@ -19,19 +54,12 @@ Load news from DB and send to client
 What has changed?
 -------------------------------
 Customized InfoWindow, put css photo carosoul, comment, and more details.
-When the users submit the data, the lat,lnt coordinates will be sent to the server as well
-Changed to new marker icons
-The server now can save the data using Sync read method.
-The client can receive the json data from the server
-Now the browser will load the data json feed from the server when its loading
-No need HttpServer, because we are using a server named Steam 0.6.0
-The client : send json and set header content-type:application/json
-The server: response addstream : Hello
+
 
 Versions:
 -------------------------------
-Last Version: V2.3
-This Version: V2.4
+Last Version: V2.4
+This Version: V2.5
 
 Change Log:
 V2.4
@@ -55,12 +83,6 @@ What has changed?
 -------------------------------
 When the users submit the data, the lat,lnt coordinates will be sent to the server as well
 Changed to new marker icons
-The server now can save the data using Sync read method.
-The client can receive the json data from the server
-Now the browser will load the data json feed from the server when its loading
-No need HttpServer, because we are using a server named Steam 0.6.0
-The client : send json and set header content-type:application/json
-The server: response addstream : Hello
 
 Versions:
 -------------------------------
@@ -90,9 +112,6 @@ What has changed?
 The server now can save the data using Sync read method.
 The client can receive the json data from the server
 Now the browser will load the data json feed from the server when its loading
-No need HttpServer, because we are using a server named Steam 0.6.0
-The client : send json and set header content-type:application/json
-The server: response addstream : Hello
 
 Versions:
 -------------------------------
