@@ -9,6 +9,8 @@ var _mapping = {
   "/": home,
   "/send": serverInfo,
   "/receive": clientInfo,
+  "/png": receivePNG,
+  "/pngReceive": sendPNG,
 };
 
 var _errormapping = {

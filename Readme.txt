@@ -1,4 +1,42 @@
 Change Log:
+V2.7 (M1)
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+1.After uploaded photos, can't upload photos again
+2.Need "keep uploading photos, remove the last one, add the new one" <===
+3.JSON.json and x.news need to be presented
+
+Next:
+-------------------------------
+Retrieve the JSON data from the server.
+Upload photo to server.
+Get IP address from user.
+Save date to WebDB or IndexedDB
+Load news from DB and send to client
+
+What has changed?
+-------------------------------
+Only allow one instance of InfoWindow at any time
+User must upload at least one photo along with the news
+If there are less than four photos for one news, it loads the default photo
+Users can upload news with photos, and submit to the server, the sever than load both the description and photos of the news
+There are significant changes since last update.
+Environment prerequisite:
+Steam upgraded to v0.6.2
+Dart Editor 0.4.3_r20602
+Dat SDK 0.4.3.5_r26062
+Server: main.dart
+Client: 10.1.1.11:5050
+The localhost has changed to 10.1.1.11:5050 for testing in my case.
+You must use r20602 version and Stream v0.6.2 to in order to run the codes correctly.
+
+Versions:
+-------------------------------
+Last Version: V2.6
+This Version: V2.7
+
+Change Log:
 V2.6
 ------------------------------------------------------------------
 What to Fix:

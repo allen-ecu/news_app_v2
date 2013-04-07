@@ -3,21 +3,20 @@
 part of server;
 
 /** Template, home, for rendering the view. */
-void home(HttpConnect connect) { //4
-  var _cxs = new List<HttpConnect>(), request = connect.request, response = connect.response, _v_;
+void home(HttpConnect connect) { //2
+  var _cs_ = new List<HttpConnect>(), request = connect.request, response = connect.response;
 
   if (!connect.isIncluded)
     response.headers.contentType = new ContentType.fromString("""text/html; charset=utf-8""");
 
   response.write("""
-
 <!DOCTYPE html>
 <html>
   <head>
     <title>Map App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link href="theme.css" rel="stylesheet">
+    <link href="../theme.css" rel="stylesheet">
   </head>
   <body>
   
@@ -32,10 +31,10 @@ void home(HttpConnect connect) { //4
   
   <table>
     <tr><td><label>Title</label></td><td><input class="text" id="title" name="title" placeholder= "Enter your news title here" required="required" autofocus="true"/></td></tr>
-    <tr><td><label>Description</label></td><td><textarea class="text" id="description" name="description" maxlength="175" required="required" placeholder= "Enter your news description here" cols="38" rows="5"></textarea></td></tr>
+    <tr><td><label>Description</label></td><td><textarea class="text" id="description" name="description" maxlength="145" required="required" placeholder= "Enter your news description here" cols="38" rows="5"></textarea></td></tr>
     <tr><td><label>Photo</label></td><td><input type="file" id="photo" name="photo" required="required" accept="image/*"/></td></tr>
-    <tr><td><label>Preview</label></td><td><img id="photo1" draggable="true" class="greyborder" alt="Photo 1"></img><img id="photo2" draggable="true" alt="Photo 2"></img><img id="photo3" draggable="true" alt="Photo 3"></img><img id="photo4" sdraggable="true" alt="Photo 4"></img></td></tr>    
-    <tr><td><label>Date</label></td><td><input type="datetime-local" id="time" name="time" required="required"/></td></tr>
+    <tr><td><label>Preview</label></td><td><img id="photo1" alt="photo1"></img><img id="photo2" alt="photo2"></img><img id="photo3" alt="photo3"></img><img id="photo4" alt="photo4"></img></td></tr>
+    <tr><td><label>Date</label></td><td><input type="datetime-local" id="time" required="required" name="time"/></td></tr>
     <tr><td><button id="submit">Submit</button></td><td id="info"></td></tr>
   </table>
   
@@ -64,7 +63,7 @@ void home(HttpConnect connect) { //4
     <!--<script src="../client.dart.js""></script>-->
   </body>
 </html>
-"""); //#4
+"""); //#2
 
   connect.close();
 }

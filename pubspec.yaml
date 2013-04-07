@@ -6,6 +6,5 @@ dependencies:
   google_maps: any
   js: any
   xml: any
-
 #  js: any
 #  unittest: any
