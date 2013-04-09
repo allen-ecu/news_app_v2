@@ -1,8 +1,8 @@
 //Configuration
 part of client;
 
-final HOST = "http://mynews2.herokuapp.com/"; // eg: localhost 
-final PORT = 5050; 
+final HOST = "http://mynews2.herokuapp.com"; // eg: localhost 
+final PORT = 8080; 
 
 
 //URI mapping
