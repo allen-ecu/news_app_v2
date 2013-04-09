@@ -15,7 +15,9 @@ heroku config:add BUILDPACK_URL=https://github.com/igrigorik/heroku-buildpack-da
 ]
 8.git push heroku master
 9.make sure you have Procfile in the root path together with pubspec.yaml
-
+10. git remote -v
+11. git remote rm xxx
+12.git remote add xxx git@heroku.com:mapapp2.git
 Change Log:
 V2.7 (M1)
 ------------------------------------------------------------------
