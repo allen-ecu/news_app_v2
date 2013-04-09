@@ -1,4 +1,20 @@
 Change Log:
+V2.8
+How to deploy dart to Heroku
+1. make sure you add your ssh key to the heroku app settings and github account settings ssh
+2. open git bash
+3. cd mynews2
+4. git pull
+5.git push
+6.git status
+7.
+heroku create myapp_name -s cedar
+heroku config:add BUILDPACK_URL=https://github.com/igrigorik/heroku-buildpack-dart.git
+8.git push heroku master
+9.make sure you have Procfile in the root path together with pubspec.yaml
+
+
+Change Log:
 V2.7 (M1)
 ------------------------------------------------------------------
 What to Fix:
