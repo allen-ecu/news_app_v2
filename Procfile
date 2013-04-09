@@ -1,1 +1,1 @@
-web: dart-sdk/bin/dart --package-root=packages/ web/webapp/main.dart
+web: dart web/webapp/main.dart
