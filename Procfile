@@ -1,1 +1,1 @@
-web: web/webapp/main.dart
+web: ./web/webapp/main.dart
