@@ -29,6 +29,6 @@ class NewsInfo {
 void main() {
   new StreamServer(uriMapping: _mapping, errorMapping: _errormapping)
   ..port = 8080
-  ..host = '0.0.0.0'
+  ..host = 'mynews2.herokuapp.com'
   ..start();
 }

@@ -1,7 +1,7 @@
 //Configuration
 part of client;
 
-final HOST = "0.0.0.0"; // eg: localhost 
+final HOST = "mynews2.herokuapp.com"; // eg: localhost 
 final PORT = 8080; 
 
 
