@@ -7,7 +7,7 @@ library server;
 import 'dart:io';
 import 'dart:async';
 import 'dart:json' as Json;
-import "package:stream/stream.dart";
+import 'package:stream/stream.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:unittest/unittest.dart';
 import 'package:rikulo_commons/mirrors.dart';
