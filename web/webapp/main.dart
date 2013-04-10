@@ -25,10 +25,9 @@ class NewsInfo {
   NewsInfo(this.title, this.description, this.photo, this.time, this.ip);
 }
 
-
 void main() {
   new StreamServer(uriMapping: _mapping, errorMapping: _errormapping)
-  ..port = 8080
-  ..host = 'mynews2.herokuapp.com'
+  ..port = int.parse(Platform.environment['PORT'])
+  ..host = int.parse(Platform.environment['HOST'])
   ..start();
 }
