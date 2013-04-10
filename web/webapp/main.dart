@@ -27,7 +27,7 @@ class NewsInfo {
 
 void main() {
   new StreamServer(uriMapping: _mapping, errorMapping: _errormapping)
-  ..port = int.parse(Platform.environment['PORT'])
-  ..host = int.parse(Platform.environment['HOST'])
+  ..port = int.parse(Platform.environment['PORT']).toString()
+  ..host = int.parse(Platform.environment['HOST']).toString()
   ..start();
 }
