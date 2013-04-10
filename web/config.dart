@@ -1,8 +1,8 @@
 //Configuration
 part of client;
 
-final PORT = int.parse(Platform.environment['PORT']).toString();
-final HOST= int.parse(Platform.environment['HOST']).toString();
+final PORT = '80';
+final HOST= 'newsapp2.herokuapp.com';
 
 //URI mapping
 //var _mapping = {

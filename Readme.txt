@@ -12,6 +12,7 @@ How to deploy dart to Heroku
 7.
 heroku create myapp_name -s cedar
 heroku config:add BUILDPACK_URL=https://github.com/igrigorik/heroku-buildpack-dart.git
+heroku config:add BUILD=21094
 ]
 8.git push heroku master
 9.make sure you have Procfile in the root path together with pubspec.yaml
