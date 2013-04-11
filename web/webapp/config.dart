@@ -2,7 +2,7 @@
 part of server;
 
 final PORT = '80';
-final HOST= 'newsapp2.herokuapp.com';
+final HOST= 'http://newsapp2.herokuapp.com';
 
 //URI mapping
 var _mapping = {
