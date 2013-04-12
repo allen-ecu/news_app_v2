@@ -3,14 +3,74 @@
 // Author: tomyeh
 part of stream_rspc;
 
-///Test if the given value is enclosed with `[= ]`.
-bool isEL(String val) => val.startsWith("[=") && val.endsWith("]");
-///Converts the value to a valid Dart statement
-///[quotmark] specifies whether to enclose the expression with `"""` if found
-String toEL(String val, {quotmark: false}) {
-  var el = isEL(val) ? val.substring(2, val.length - 1).trim(): null;
-  return el == null ? val != null ? '"""$val"""': quotmark ? '""': "null":
-    el.isEmpty ? '""': quotmark ? '"""\${$el}"""': el;
+/** Test if the given value is enclosed with `[= ]`.
+ * If null, false is returned.
+ */
+bool isEL(String data) {
+  for (int i = 0, len = data != null ? data.length: 0; i < len; ++i) {
+    final cc = data[i];
+    if (cc == '\\')
+      ++i;
+    else if (cc == '[' && i + 1 < len && data[i + 1] == '=')
+      return true;
+  }
+  return false;
+}
+/** Converts the given value to a valid Dart statement.
+ *
+ * * [data] - the value to convert. It can be null.
+ * * [direct] - whether it is OK to return an expression, if any, directly
+ * without enclosing with `"""`/
+ * If true and `data` contains nothing but a single expression, the expression
+ * is output directly
+ */
+String toEL(String data, {direct: true}) {
+  if (data == null)
+    return direct ? "null": '""';
+
+  final sb = new StringBuffer();
+  for (int i = 0, len = data.length; i < len; ++i) {
+    final cc = data[i];
+    if (cc == '[' && i + 1 < len && data[i + 1] == '=') { //found
+      final j = _skipToELEnd(data, i + 2),
+          val = data.substring(i + 2, j).trim();
+      if (direct && i == 0 && j + 1 == len) //single EL
+        return val;
+      if (!val.isEmpty)
+        sb..write("\${nnstr(")..write(val)..write(")}");
+
+      i = j;
+      continue;
+    }
+
+    sb.write(cc);
+    if (cc == '\\')
+      sb.write(data[++i]);
+  }
+  return '"""$sb"""';
+}
+int _skipToELEnd(String data, int from) {
+  String sep;
+  int nbkt = 0;
+  for (int len = data.length; from < len; ++from) {
+    final cc = data[from];
+    if (cc == '\\') {
+      ++from;
+    } else if (sep == null) {
+      if (cc == '"' || cc == "'") {
+        sep = cc;
+      } else if (nbkt == 0 && cc == ']') { //'/' is a valid operator
+        return from;
+      } else if (cc == '[') {
+        ++nbkt;
+      } else if (cc == ']') {
+        --nbkt;
+      }
+    } else if (cc == sep) {
+      sep = null;
+    }
+  }
+  throw new SyntaxError("", -1, "Expect ']'");
 }
 
 ///Parse the information of the arguments.

@@ -33,7 +33,7 @@ void home(HttpConnect connect) { //2
     <tr><td><label>Title</label></td><td><input class="text" id="title" name="title" placeholder= "Enter your news title here" required="required" autofocus="true"/></td></tr>
     <tr><td><label>Description</label></td><td><textarea class="text" id="description" name="description" maxlength="145" required="required" placeholder= "Enter your news description here" cols="38" rows="5"></textarea></td></tr>
     <tr><td><label>Photo</label></td><td><input type="file" id="photo" name="photo" required="required" accept="image/*"/></td></tr>
-    <tr><td><label>Preview</label></td><td><img id="photo1" alt="photo1"></img><img id="photo2" alt="photo2"></img><img id="photo3" alt="photo3"></img><img id="photo4" alt="photo4"></img></td></tr>
+    <tr><td><label>Preview</label></td><td><img id="photo1" class="a4" alt="photo1"></img><img id="photo2" class="a4" alt="photo2"></img><img id="photo3" class="a4" alt="photo3"></img><img id="photo4" class="a4" alt="photo4"></img></td></tr>
     <tr><td><label>Date</label></td><td><input type="datetime-local" id="time" required="required" name="time"/></td></tr>
     <tr><td><button id="submit">Submit</button></td><td id="info"></td></tr>
   </table>

@@ -4,11 +4,30 @@
 part of stream;
 
 /** The general handler. */
-typedef void Handler();
+typedef void VoidCallback();
 /** The error handler. */
-typedef void ErrorHandler(err, [stackTrace]);
+typedef void ErrorCallback(err, [stackTrace]);
 /** The error handler for HTTP connection. */
-typedef void ConnectErrorHandler(HttpConnect connect, err, [stackTrace]);
+typedef void ConnectErrorCallback(HttpConnect connect, err, [stackTrace]);
+
+/** The request filter. It is used with the `filterMapping` parameter of [StreamServer].
+ *
+ * * [chain] - the callback to *resume* the request handling. If there is another filter,
+ * it will be invoked when you call back [chain]. If you'd like to skip the handling (e.g., redirect to another page),
+ * you don't have to call back [chain].
+ *
+ * Before calling back [chain], you can proxy the request and/or response, such as writing the
+ * the response to a string buffer.
+ */
+typedef void RequestFilter(HttpConnect connect, void chain(HttpConnect conn));
+/** The request filter.
+ *
+ * If it renders the response, it doesn't need to return anything (i.e., `void`).
+ * If not, it shall return an URI (which is a non-empty string,
+ * starting with * `/`) that the request shall be forwarded to.
+ */
+typedef RequestHandler(HttpConnect connect);
+
 
 /** A HTTP request connection.
  */
@@ -60,7 +79,7 @@ abstract class HttpConnect {
    *
    * Notice the default implementation is `connect.forward(connect, uri...)`.
    */
-  void forward(String uri, {Handler success, HttpRequest request, HttpResponse response});
+  void forward(String uri, {VoidCallback success, HttpRequest request, HttpResponse response});
   /** Includes the given [uri].
    * If you'd like to include a request handler (i.e., a function), use [StreamServer]'s
    * `connectForInclusion` instead.
@@ -83,31 +102,24 @@ abstract class HttpConnect {
    *
    * Notice the default implementation is `connect.include(connect, uri...)`.
    */
-  void include(String uri, {Handler success, HttpRequest request, HttpResponse response});
+  void include(String uri, {VoidCallback success, HttpRequest request, HttpResponse response});
 
-  /** The map of error and close handlers.
-   * It is used to register the handler that will be called when an error occurs, or when [close]
-   * is called, depending which list it is registered.
-   *
-   * Notice the sequence of invocation is reversed, i.e., the first added is the last called.
-   */
-  Handlers get on;
   /** The close handler.
    * After finishing the handling of a request, the request handler shall invoke this method
-   * to start the awaiting task, or to
-   * close the connection (depending on if the request handler is included / forwarded).
+   * to start the awaiting tasks and to close the connection if necessary
+   * (depending on if the request handler is included / forwarded).
    *
    * To register an awaiting task that shall be run after the request handling, you can invoke
-   * `on.close.add()` (refer to [on]). To register an error handler, you can invoke `on.error.add()`.
+   * [onClose], i.e., `onClose.listen(...)`. To register an error handler, you can invoke [onError].
    */
-  Handler get close;
+  VoidCallback get close;
   /** The error handler.
    *
    * Notice that it is important to invoke this method if an error occurs.
    * Otherwise, the HTTP connection won't be closed, and, even worse, the server might stop from
    * execution.
    *
-   * ##Assign onError with the return value of this method
+   * ##Assign `onError` with the return value of this method
    *
    *     final res = connect.response;
    *     file.openRead().listen((data) {res.add(data);},
@@ -123,12 +135,30 @@ abstract class HttpConnect {
    *       }
    *       throw new Http404();
    *     }).catchError(connect.error); //forward to Stream's error handling
+   *
+   * To register an error handler, you can invoke [onError].
    */
-  ErrorHandler get error;
+  ErrorCallback get error;
   /** The error detailed information (which is the information when [error]
    * has been called), or null if no error.
    */
   ErrorDetail errorDetail;
+
+  /** The event stream for registering awating task. Each event is an instance of [HttpConnect].
+   * It is called when [close] was called.
+   *
+   * Notice: the first registred listener is the last called (FILO).
+   */
+  Stream<HttpConnect> get onClose;
+  /** The stream for registering the error handling. Each event is the error.
+   * It was called when an error occurs, including [error] is called explicitly.
+   *
+   * If a stack trace is available, the error will be wrapped as `AsyncError`.
+   *
+   * Notice: the first registred listener is the last called (FILO).
+   */
+  Stream get onError;
+
   /** A map of application-specific data.
    *
    * Note: the name of the keys can't start with "stream.", which is reserved
@@ -160,26 +190,30 @@ class HttpConnectWrapper implements HttpConnect {
   bool get isForwarded => origin.isForwarded;
 
   @override
-  void forward(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void forward(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     origin.forward(uri, success: success, request: request, response: response);
   }
   @override
-  void include(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void include(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     origin.include(uri, success: success, request: request, response: response);
   }
 
   @override
-  Handlers get on => origin.on;
+  VoidCallback get close => origin.close;
   @override
-  Handler get close => origin.close;
-  @override
-  ErrorHandler get error => origin.error;
+  ErrorCallback get error => origin.error;
   @override
   ErrorDetail get errorDetail => origin.errorDetail;
   @override
   void set errorDetail(ErrorDetail errorDetail) {
     origin.errorDetail = errorDetail;
   }
+
+  @override
+  Stream<HttpConnect> get onClose => origin.onClose;
+  @override
+  Stream get onError => origin.onError;
+
   Map<String, dynamic> get dataset => origin.dataset;
 }
 
@@ -188,50 +222,6 @@ class ErrorDetail {
   var error;
   var stackTrace;
   ErrorDetail(this.error, this.stackTrace);
-}
-
-/** A list of handlers of a particular type.
- * Notice the sequence of invocation is reversed, i.e., the first added is the last called.
- */
-class HandlerList<T extends Function> {
-  Queue<T> _handlers;
-
-  /** Adds a handler.
-   * Notice the sequence of invocation is reversed, i.e., the first added is the last called.
-   */
-  void add(T handler) {
-    if (_handlers == null)
-      _handlers = new Queue();
-    _handlers.addFirst(handler);
-  }
-  /** Removes a handler.
-   */
-  void remove(T handler) {
-    if (_handlers != null)
-      _handlers.remove(handler);
-  }
-  void _invoke0() {
-    if (_handlers != null)
-      for (final h in _handlers)
-        h();
-  }
-  void _invoke2(arg0, arg1) {
-    if (_handlers != null)
-      for (final h in _handlers)
-        h(arg0, arg1);
-  }
-}
-/** All handlers.
- */
-class Handlers {
-  /** The list of close handlers.
-   * Notice the sequence of invocation is reversed, i.e., the first added is the last called.
-   */
-  final HandlerList<Handler> close = new HandlerList();
-  /** The list of error handlers.
-   * Notice the sequence of invocation is reversed, i.e., the first added is the last called.
-   */
-  final HandlerList<ErrorHandler> error = new HandlerList();
 }
 
 /** A HTTP status exception.

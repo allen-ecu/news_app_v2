@@ -41,7 +41,7 @@ abstract class TagContext {
 
   ///Writes a string to [output] in the compiler's encoding.
   void write(String str) {
-    output.addString(str, compiler.encoding);
+    output.write(str);
   }
   ///Write a string plus a linefeed to [output] in the compiler's encoding.
   void writeln([String str]) {
@@ -97,10 +97,17 @@ Map<String, Tag> _tags;
 class PageTag extends Tag {
   @override
   void begin(TagContext tc, String data) {
-    String name, desc, args, ctype;
+    String partOf, imports, name, desc, args, ctype;
     final attrs = ArgInfo.parse(data);
     for (final nm in attrs.keys) {
       switch (nm) {
+        case "partOf":
+        case "part-of":
+          partOf = attrs[nm];
+          break;
+        case "import":
+          imports = attrs[nm];
+          break;
         case "name":
           name = attrs[nm];
           break;
@@ -122,7 +129,7 @@ class PageTag extends Tag {
           break;
       }
     }
-    tc.compiler.setPage(name, desc, args, ctype);
+    tc.compiler.setPage(partOf, imports, name, desc, args, ctype);
   }
   @override
   bool get hasClosing => false;
@@ -245,12 +252,12 @@ class VarTag extends Tag {
     var varnm = tc.data
       = parentArgs != null ? (parentArgs[argInfo.first] = tc.nextVar()): argInfo.first;
 
-    tc.writeln("\n${tc.pre}var $varnm = new StringBuffer(); _cxs.add(connect); //var#${tc.line}\n"
+    tc.writeln("\n${tc.pre}var $varnm = new StringBuffer(); _cs_.add(connect); //var#${tc.line}\n"
       "${tc.pre}connect = new HttpConnect.buffer(connect, $varnm); response = connect.response;");
   }
   @override
   void end(TagContext tc) {
-    tc.writeln("\n${tc.pre}connect = _cxs.removeLast(); response = connect.response;");
+    tc.writeln("\n${tc.pre}connect = _cs_.removeLast(); response = connect.response;");
     if (tc.parent.args == null) {
       String varnm = tc.data;
       tc.writeln("${tc.pre}$varnm = $varnm.toString();");

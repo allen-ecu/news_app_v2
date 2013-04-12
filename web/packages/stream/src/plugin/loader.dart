@@ -86,6 +86,7 @@ void loadFile(HttpConnect connect, File file) {
 
 void _loadFile(HttpConnect connect, File file) {
   final res = connect.response;
-  file.openRead().listen((data) {res.add(data);},
+  file.openRead().listen((data) {res.writeBytes(data);},
     onDone: connect.close, onError: connect.error);
+  res.done.catchError(connect.error); //TODO: if Issue 9567 fixed, move it to beginning
 }

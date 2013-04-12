@@ -7,13 +7,14 @@ part of stream_rspc;
  * The RSP compiler
  */
 class Compiler {
-  final String sourceName;
   final String source;
+  final String sourceName;
   final IOSink destination;
+  final String destinationName;
   final Encoding encoding;
   final bool verbose;
-  //the closure's name, args
-  String _name, _args, _desc, _contentType;
+  //the closure's partOf, import, name, args...
+  String _partOf, _import, _name, _args, _desc, _contentType;
   final List<_TagContext> _tagCtxs = [];
   _TagContext _current;
   //The position, length and _line of the source
@@ -21,11 +22,12 @@ class Compiler {
   //Look-ahead tokens
   final List _lookAhead = [];
   final List<_IncInfo> _incs = []; //included
+  final List<_QuedTag> _quedTags = []; //queued tags (before _start is called)
   String _extra = ""; //extra whitespaces
   int _nextVar = 0; //used to implement TagContext.nextVar()
 
   Compiler(this.source, this.destination, {
-      this.sourceName, this.encoding:Encoding.UTF_8, this.verbose: false}) {
+      this.sourceName, this.destinationName, this.encoding:Encoding.UTF_8, this.verbose: false}) {
     _tagCtxs.add(_current = new _TagContext.root(this, destination));
     _len = source.length;
   }
@@ -71,12 +73,22 @@ class Compiler {
         token.end(_current);
         pop();
       } else if (token is DartTag) {
+        if (!started) {
+          _quedTags.add(new _QuedTag(token, _dartData()));
+          continue;
+        }
+
         push(token);
         token.begin(_current, _dartData());
         token.end(_current);
         pop();
       } else if (token is Tag) {
         if (!started) {
+          if (token is HeaderTag) {
+          //note: token.hasClosing must be false
+            _quedTags.add(new _QuedTag(token, _tagData(tag: token)));
+            continue;
+          }
           started = true;
           _start();
         }
@@ -121,10 +133,17 @@ class Compiler {
       if (sourceName == null || sourceName.isEmpty)
         _error("The page tag with the name attribute is required", line);
 
-      final i = sourceName.lastIndexOf('/') + 1,
-        j = sourceName.indexOf('.', i);
-      _name = StringUtil.camelize(
-        j >= 0 ? sourceName.substring(i, j): sourceName.substring(i));
+      _name = new Path(sourceName).filename;
+      var i = _name.indexOf('.');
+      _name = StringUtil.camelize(i < 0 ? _name: _name.substring(0, i));
+
+      for (i = _name.length; --i >= 0;) { //check if _name is legal
+        final cc = _name[i];
+        if (!StringUtil.isChar(cc, upper:true, lower: true, digit: true)
+            && cc != '\$' && cc != '_')
+          _error("Unable to generate a legal function name from $sourceName. "
+            "Please specify the name with the page tag.", line);
+      }
     }
 
     if (verbose) _info("Generate $_name from line $line");
@@ -142,23 +161,64 @@ class Compiler {
       }
     }
 
+    final imports = new LinkedHashSet.from(["dart:io", "package:stream/stream.dart"]);
+    if (_import != null && !_import.isEmpty)
+      imports.addAll(_import.split(','));
+
+    if (_partOf == null || _partOf.isEmpty) { //independent library
+      var lib = new Path(sourceName).filename;
+      var i = lib.lastIndexOf('.'); //remove only one extension
+      if (i >= 0) lib = lib.substring(0, i);
+
+      final sb = new StringBuffer(), len = lib.length;
+      for (i = 0; i < len; ++i) {
+        final cc = lib[i];
+        sb.write(StringUtil.isChar(cc, upper:true, lower: true, digit: true)
+            || cc == '\$' ? cc: '_');
+      }
+      _writeln("library $sb;\n");
+
+      for (final impt in imports)
+        _writeln("import ${_toImport(impt)};");
+    } else if (_partOf.endsWith(".dart")) { //needs to maintain the given dart file
+      _writeln("part of ${_mergePartOf(imports)};");
+    } else {
+      if (_import != null && !_import.isEmpty)
+        _warning("The import attribute is ignored since the part-of attribute is given");
+      _writeln("part of $_partOf;");
+    }
+
     _current.indent();
     _write("\n/** $_desc */\nvoid $_name(HttpConnect connect");
     if (_args != null)
       _write(", {$_args}");
     _writeln(") { //$line\n"
-      "  var _cxs = new List<HttpConnect>(), request = connect.request, response = connect.response, _v_;\n");
+      "  var _cs_ = new List<HttpConnect>(), request = connect.request, response = connect.response;\n");
 
     if (_contentType != null) {
       if (!ctypeSpecified) //if not specified, it is set only if not included
         _write('  if (!connect.isIncluded)\n  ');
       _writeln('  response.headers.contentType = new ContentType.fromString('
-        '${toEL(_contentType, quotmark:true)});');
+        '${toEL(_contentType, direct: false)});');
     }
+
+    //generated the tags found before _start() is called.
+    for (final ti in _quedTags) {
+      push(ti.tag);
+      ti.tag.begin(_current, ti.data);
+      ti.tag.end(_current);
+      pop();
+    }
+    _quedTags.clear();
   }
 
   ///Sets the page information.
-  void setPage(String name, String description, String args, String contentType, [int line]) {
+  void setPage(String partOf, String imports, String name, String description, String args,
+      String contentType, [int line]) {
+    _partOf = partOf;
+    _noEL(partOf, "the partOf attribute", line);
+    _import = imports;
+    _noEL(_import, "the import attribute", line);
     _name = name;
     _noEL(name, "the name attribute", line);
     _desc = description;
@@ -172,11 +232,11 @@ class Compiler {
   void includeUri(String uri, [Map args, int line]) {
     _checkInclude(line);
     if (args != null && !args.isEmpty)
-      _error("Include URI with arguments", line); //TODO: handle arguments
+      _error("Not supported: include URI with arguments", line); //TODO: handle arguments
     if (verbose) _info("Include $uri", line);
 
     _writeln('\n${_current.pre}connect.include('
-      '${toEL(uri, quotmark:true)}, success: () { //#$line');
+      '${toEL(uri, direct: false)}, success: () { //#$line');
     _extra = "  $_extra";
     _incs.add(new _IncInfo("});"));
   }
@@ -211,11 +271,11 @@ class Compiler {
   ///Forward to the given URI.
   void forwardUri(String uri, [Map args, int line]) {
     if (args != null && !args.isEmpty)
-      _error("Forward URI with arguments"); //TODO: handle arguments
+      _error("Not supported: forward URI with arguments"); //TODO: handle arguments
     if (verbose) _info("Forward $uri", line);
 
     _writeln("\n${_current.pre}connect.forward("
-      "${toEL(uri, quotmark:true)}); //#${line}\n"
+      "${toEL(uri, direct: false)}); //#${line}\n"
       "${_current.pre}return;");
   }
   //Forward to the given renderer
@@ -257,17 +317,22 @@ class Compiler {
           if (c2 == '=') { //[=exprssion]
             _pos = j + 1;
             return new _Expr();
-          } else if (c2 == '/') { //[/closing-tag]
+          } else if (c2 == ':' || c2 == '/') { //[:beginning-tag] or [/closing-tag]
             int k = j + 1;
             if (k < _len && StringUtil.isChar(source[k], lower:true)) {
               int m = _skipId(k);
               final tagnm = source.substring(k, m);
               final tag = tags[tagnm];
-              if (tag != null && m < _len && source[m] == ']') { //tag found
-                if (!tag.hasClosing)
-                  _error("[/$tagnm] not allowed. It doesn't need the closing tag.", _line);
-                _pos = m + 1;
-                return new _Closing(tagnm);
+              if (tag != null) {
+                if (c2 == ':') { //beginning of tag
+                  _pos = m;
+                  return tag;
+                } else if (m < _len && source[m] == ']') { //ending of tag found
+                  if (!tag.hasClosing)
+                    _error("[/$tagnm] not allowed. It doesn't need the closing tag.", _line);
+                  _pos = m + 1;
+                  return new _Closing(tagnm);
+                }
               }
             }
             //fall through
@@ -277,12 +342,11 @@ class Compiler {
               continue;
             }
           } else if (StringUtil.isChar(c2, lower:true)) { //[beginning-tag]
+          //deprecated (TODO: remove later)
             int k = _skipId(j);
-            final tag = tags[source.substring(j, k)];
-            if (tag != null) { //tag found
-              _pos = k;
-              return tag;
-            }
+            final tn = source.substring(j, k), tag = tags[tn];
+            if (tag != null) //tag found
+              _warning("[$tn] is deprecated and ignored. Please use [:$tn] instead.", _line);
             //fall through
           }
         }
@@ -365,7 +429,7 @@ class Compiler {
     return from;
   }
   ///Skip arguments (of a tag)
-  int _skipTagArgs(int from) {
+  int _skipTagArgs(int from, bool ignoreSlash) {
     final line = _line;
     String sep;
     int nbkt = 0;
@@ -379,7 +443,7 @@ class Compiler {
       } else if (sep == null) {
         if (cc == '"' || cc == "'") {
           sep = cc;
-        } else if (nbkt == 0 && (cc == '/' || cc == ']')) {
+        } else if (nbkt == 0 && ((!ignoreSlash && cc == '/') || cc == ']')) {
           return from;
         } else if (cc == '[') {
           ++nbkt;
@@ -393,8 +457,8 @@ class Compiler {
     _error("Expect ']'", line);
   }
   ///Note: [tag] is required if `tag.hasClosing` is 
-  String _tagData({Tag tag, skipFollowingSpaces: true}) {
-    int k = _skipTagArgs(_pos);
+  String _tagData({Tag tag, skipFollowingSpaces: true, ignoreSlash: false}) {
+    int k = _skipTagArgs(_pos, ignoreSlash);
     final data = source.substring(_pos, k).trim();
     _pos = k + 1;
     if (source[k] == '/') {
@@ -438,36 +502,162 @@ class Compiler {
         _writeln("\n$pre//#$line");
         line = null;
       }
-      _writeln('$pre${_outTripleQuot(text.substring(i, j))}\n'
-        '${pre}response.addString(\'"""\');');
+      _writeln('$pre${_toTripleQuot(text.substring(i, j))}\n'
+        '${pre}response.write(\'"""\');');
       i = j + 3;
     }
     if (i == 0) {
-      _write('\n$pre${_outTripleQuot(text)}');
+      _write('\n$pre${_toTripleQuot(text)}');
       if (line != null) _writeln(" //#$line");
     } else {
-      _writeln('$pre${_outTripleQuot(text.substring(i))}');
+      _writeln('$pre${_toTripleQuot(text.substring(i))}');
     }
   }
-  String _outTripleQuot(String text) {
+  String _toTripleQuot(String text) {
     //Note: Dart can't handle """" (four quotation marks)
     var cb = text.startsWith('"') || text.indexOf('\n') >= 0 ? '\n': '', ce = "";
     if (text.endsWith('"')) {
       ce = '\\"';
       text = text.substring(0, text.length - 1);
     }
-    return 'response.addString("""$cb$text$ce""");';
+    return 'response.write("""$cb$text$ce""");';
   }
 
   void _outExpr() {
     //it doesn't push, so we have to use _line instead of _current.line
     final line = _line; //_tagData might have multiple lines
-    final expr = _tagData(skipFollowingSpaces: false); //no skip space for expression
+    final expr = _tagData(ignoreSlash: true, skipFollowingSpaces: false);
+      //1) '/' is NOT a terminal, 2) no skip space for expression
     if (!expr.isEmpty) {
       final pre = _current.pre;
-      _writeln('\n${pre}_v_ = $expr; //#${line}\n'
-        '${pre}if (_v_ != null) response.addString("\$_v_");');
+      _writeln('\n${pre}response.write(nnstr($expr)); //#${line}\n');
     }
+  }
+
+  ///merge partOf, and returns the library name
+  String _mergePartOf(Set<String> imports) {
+    if (destinationName == null)
+      _error("The partOf attribute refers to a dart file is allowed only if destination is specified");
+
+    Path libpath = new Path(_partOf),
+        mypath = new Path(destinationName);
+    if (!libpath.isAbsolute)
+      libpath = mypath.directoryPath.join(libpath);
+    mypath = mypath.relativeTo(libpath.directoryPath);
+
+    File libfile = new File.fromPath(libpath);
+    if (!libfile.existsSync()) {
+      String libnm = libpath.filename;
+      libnm = libnm.substring(0, libnm.indexOf('.')).toString();
+        //filename must end with .dart (but it might have other extension ahead)
+
+      final buf = new StringBuffer()
+        ..write("library ")..write(libnm)..writeln(";\n");
+      for (final impt in imports)
+        buf.writeln("import ${_toImport(impt)};");
+      buf..write("\npart '")..write(mypath)..writeln("';");
+      libfile.writeAsStringSync(buf.toString(), encoding: encoding);
+      return libnm;
+    }
+
+    //parse libfile (TODO: use a better algorithm to parse rather than readAsStringSync/writeAsStringSync)
+    String libnm;
+    bool comment0 = false, comment1 = false;
+    Set<String> libimports = new Set(), libparts = new Set();
+    final data = libfile.readAsStringSync();
+    int len = data.length, importPos, partPos = len;
+    for (int i = 0, j; i < len; ++i) {
+      final cc = data[i];
+      if (comment0) { //look for \n
+        if (cc == '\n')
+          comment0 = false;
+      } else if (comment1) {
+        if (cc == '*' && i + 1 < len && data[i + 1] == '/') {
+          ++i;
+          comment1 = false;
+        }
+      } else if (cc == '/') {
+        if (i + 1 < len) {
+          final c2 = data[i + 1];
+          comment0 = c2 == '/';
+          comment1 = c2 == '*';
+          if (comment0 || comment1)
+            ++i;
+        }
+      } else if ((j = _startsWith(data, i, "library")) >= 0) {
+        i = _skipWhitespace(data, j);
+        j = data.indexOf(';', i);
+        if (j < 0)
+          _error("Illegal library syntax found in $libfile");
+        libnm = data.substring(i, j).trim();
+        i = j;
+      } else if ((j = _startsWith(data, i, "import")) >= 0) {
+        i = _skipWhitespace(data, j);
+        j = data.indexOf(';', i);
+        if (j < 0)
+          _error("Illegal import syntax found in $libfile");
+        libimports.add(data.substring(i, j).trim().replaceAll('"', "'").replaceAll('\\', '/'));
+        i = j;
+      } else if ((j = _startsWith(data, i, "part")) >= 0) {
+        if (importPos == null)
+          importPos = i;
+        i = _skipWhitespace(data, j);
+        j = data.indexOf(';', i);
+        if (j < 0)
+          _error("Illegal part syntax found in $libfile");
+        libparts.add(data.substring(i, j).trim().replaceAll('"', "'").replaceAll('\\', '/'));
+        i = j;
+      } else if (!StringUtil.isChar(cc, whitespace: true)) {
+        partPos = i;
+        break;
+      }
+    }
+
+    if (libnm == null)
+      _error("The library directive not found in $libfile");
+
+    List<String> importToAdd = [];
+    for (final impt in imports) {
+      final s = _toImport(impt);
+      if (!libimports.contains(s))
+        importToAdd.add(s);
+    }
+
+    String mynm = "'$mypath'";
+    if (libparts.contains(mynm))
+      mynm = null; //no need to add
+
+    if (!importToAdd.isEmpty || mynm != null) {
+      final srcnm = sourceName != null ? sourceName: mypath.toString();
+      final buf = new StringBuffer();
+
+      if (importToAdd.isEmpty) {
+        buf.write(data.substring(0, partPos));
+      } else {
+        if (importPos == null)
+          importPos = partPos;
+        buf.write(data.substring(0, importPos));
+        for (final impt in importToAdd)
+          buf..write("import ")..write(impt)..writeln("; //auto-inject from $srcnm");
+        buf..write('\n')..write(data.substring(importPos, partPos));
+      }
+
+      if (mynm != null)
+        buf..write("part ")..write(mynm)..writeln("; //auto-inject from $srcnm\n");
+      buf.write(data.substring(partPos));
+
+      libfile.writeAsStringSync(buf.toString(), encoding: encoding);
+    }
+    return libnm;
+  }
+
+  ///Generate import xxx;
+  String _toImport(String impt) {
+    impt = impt.trim();
+    for (int i = 0, len = impt.length; i < len; ++i)
+      if (StringUtil.isChar(impt[i], whitespace: true))
+        return "'${impt.substring(0, i)}'${impt.substring(i)}";
+    return "'$impt'";
   }
 
   void _write(String str) {
@@ -564,4 +754,24 @@ class _IncInfo {
   ///The statement to generate. If null, it means URI is included (rather than handler)
   final String invocation;
   _IncInfo(this.invocation);
+}
+///Queued tag
+class _QuedTag {
+  Tag tag;
+  String data;
+  _QuedTag(this.tag, this.data);
+}
+
+int _startsWith(String data, int i, String pattern) {
+  for (int len = data.length, pl = pattern.length, j = 0;; ++i, ++j) {
+    if (j >= pl)
+      return i; //found
+    if (i >= len || data[i] != pattern[j])
+      return -1;
+  }
+}
+int _skipWhitespace(String data, int i) {
+  for (int len = data.length; i < len && StringUtil.isChar(data[i], whitespace: true); ++i)
+    ;
+  return i;
 }

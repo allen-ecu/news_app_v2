@@ -68,9 +68,15 @@ void main() {
   });
   
   //get image from users
+  try
+  {
   InputElement uploadInput = query('#photo');
   getIMAGE(uploadInput);
-  
+  }
+  catch(e)
+  {
+    print('upload error: $e');
+  }
   /*
   query('#photo2').onMouseOver.listen((e){
     drawCross(e);
@@ -91,10 +97,13 @@ void main() {
   resetElement('#title');
   resetElement('#description');
   resetElement('#time');
-  resetImages(1);
-  resetImages(2);
-  resetImages(3);
-  resetImages(4);
+  int l = photoData.length;
+  for(int i = 0 ; i < l; i++)
+  {
+    resetImages(i+1);
+    index = 0;
+    photoData.clear();
+  }
   //ajaxGetJSON();
   });
   
@@ -109,13 +118,13 @@ void resetImages(int index) {
   ImageElement iIma = new ImageElement();
   iIma.src = null;
   iIma.id= 'photo$index';
-  iIma.alt = 'img$index';
+  iIma.alt = 'photo$index';
+  iIma.classes = ['a4'];
   query('#IMG_$index').replaceWith(iIma);
 }
 
 void getIMAGE(InputElement uploadInput) {
   uploadInput.onChange.listen((e){
-  
     if(index < n_pho)
     {
       final files = uploadInput.files;
@@ -127,14 +136,34 @@ void getIMAGE(InputElement uploadInput) {
           photoData.add(reader.result);
           data = reader.result;
           //print image data
-          showIMG('#photo$index');
+          showIMG('#photo$index', data);
         });
         reader.readAsDataUrl(file);
       }
     }
-    if(index == 3)
+    if(index == 4)
     {
-      query('#photo').hidden = true;
+      final files = uploadInput.files;
+      if (files.length == 1) {
+        final file = files[0];
+        final reader = new FileReader();
+        reader.onLoad.listen((e) {
+          //save image data to global variable
+          photoData.add(reader.result);
+          data = reader.result;
+          //swap image data
+          ImageElement img4 = query('#IMG_4');
+          ImageElement img3 = query('#IMG_3');
+          ImageElement img2 = query('#IMG_2');
+          ImageElement img1 = query('#IMG_1');
+          img1.src = img2.src;
+          img2.src = img3.src;
+          img3.src = img4.src;
+          img4.src = data;
+          index--;
+        });
+        reader.readAsDataUrl(file);
+      }
     }
     index++;
   });
@@ -173,10 +202,8 @@ void drawIMG(iD, ImageElement img) {
 //show uploaded image
 //show red border when mouse over
 //swap images src id by drag and drop
-void showIMG(var iD) {
-  
+void showIMG(var iD, var data) {
   var sub = iD.substring(6);
-  
   //show red border when mouse over
   showRedBorder(id){
     query('#IMG_$id').classes.remove('greyborder');
@@ -210,10 +237,11 @@ void showIMG(var iD) {
     ImageElement dragPP = query('#$dragID');
     dragPP.src = old.src;
   }
-    
+  
   var img = new ImageElement()
   ..id = 'IMG_$sub'
   ..src = data
+  ..classes = ['a4']
   ..draggable = true
   ..width = widthIMG
   ..height = heightIMG
@@ -222,8 +250,14 @@ void showIMG(var iD) {
   ..onDragStart.listen((e) => dragf(e))
   ..onDragOver.listen((e) => e.preventDefault())
   ..onDrop.listen((e) => dropf(e));
-  
+  try
+  {
   query(iD).replaceWith(img);
+  }
+  catch(e)
+  {
+  print('Replace Photo Error: $e');
+  }
 }
 
 void validNumLett(KeyboardEvent e) {
@@ -268,14 +302,13 @@ void ajaxSendJSON()
     _sendJSON(jsonData);
     
     int len = photoData.length;
+    if(len > 4)//send first four photos only
+      len = 4;
     String input;
     for (int i = 0; i< len; i++)
     {
     String tmp = photoData[i];
-    if(input == null)
-      input = '$input$tmp';
-    else
-      input = '$input,$tmp';
+    input = '$input$tmp';
     }
     _sendPNG(input);
   }
@@ -283,7 +316,7 @@ void ajaxSendJSON()
   {
     var elem = new LabelElement();
     elem.id = 'error';
-    elem.text = 'Fill the title, description, time and at least one photo!';
+    elem.text = 'Fill the title, description, time and min one photo!';
     if(query('#ok')!=null)
     {
       query('#ok').replaceWith(elem);
@@ -366,7 +399,7 @@ bool mapImageJSON()
   {
     int l = photoData.length;
     if(l>0)
-      return true; // convert map to String i.e. JSON
+      return true;
     else
       return false;
   }
@@ -483,17 +516,13 @@ void loadMap(List<Map> data, List<List<String>> album, var MarkerImage) {
       gooMarker.add(marker);
       
        //set mouseover trigger contents window pops up
-      gooMarker[i].on.mouseover.add((e) {
+      gooMarker[i].on.click.add((e) {
         if(infoNum == 0)
         {
-        infoWind[i].open(map, gooMarker[i]);
-        infoNum++;
+          infoWind[i].open(map, gooMarker[i]);
+          infoNum++;
         }
-      });
-      // only one infowindow instance is allowed at any time
-      //set mouseout trigger contents window closed
-      gooMarker[i].on.click.add((e) {
-        if(infoNum > 0)
+        else
         {
           infoWind[i].close();
           infoNum--;
@@ -546,51 +575,54 @@ void setupContent(String vTitle, String vUserTime, String vDescription, List<Str
   }
   content.innerHtml='''
   <div class="tabs">
-    <div class="tab">
-      <input id="tab-1" checked="checked" name="tab-group-1" type="radio"></input>
-      <label for="tab-1">Overview</label>
-      <div class="content">
-  <table id="infotable">
-            <tr>
-              <td colspan="2" id="infotitle">$vTitle</td>
-            </tr>
-            <tr>
-              <td id="infotime">$vUserTime</td>
-              <td rowspan="2" id="infodesc"><div>$vDescription</div></td>
-            </tr>
-            <tr>
-              <td><img id="photo_default" width=90px height=90px alt="img_default" src=$cover></img></td>
-            </tr>
-    </table>
-      </div>
+  <div class="tab">
+    <input id="tab-1" checked="checked" name="tab-group-1" type="radio" />
+    <label for="tab-1">Overview</label>
+    <div class="content">
+      <table id="infotable">
+        <tr>
+          <td id="infotitle" colspan="2">$vTitle</td>
+        </tr>
+        <tr>
+          <td id="infotime">$vUserTime</td>
+        </tr>
+        <tr>
+          <td id="des">
+          <img id="cover" alt="img_default" src=$cover>$vDescription
+          </td>
+        </tr>
+      </table>
     </div>
-    <div class="tab">
-      <input id="tab-2" name="tab-group-1" type="radio"></input>
-      <label for="tab-2">Details</label>
-      <div class="content">
-  Details </div>
-    </div>
-    <div class="tab">
-      <input id="tab-3" name="tab-group-1" type="radio"></input>
-      <label for="tab-3">Photos</label>
-      <div id="carousel"class="content">
-  <div id="carousel">
-  <img src="$photo1" width="261" height="216" alt="photo_1">
-  <img src="$photo2" width="261" height="216" alt="photo_2">
-  <img src="$photo3" width="261" height="216" alt="photo_3">
-  <img src="$photo4" width="261" height="216" alt="photo_4">
   </div>
+  <div class="tab">
+    <input id="tab-2" name="tab-group-1" type="radio" /> <label for="tab-2">
+    Details</label>
+    <div class="content" id="detail" overflow="scroll">$vDescription</div>
+  </div>
+  <div class="tab">
+    <input id="tab-3" name="tab-group-1" type="radio" /> <label for="tab-3">
+    Photos</label>
+    <div id="carousel" class="content">
+      <div id="carousel">
+        <img alt="photo_1" src="$photo1" height="216" width="261">
+        <img alt="photo_2" src="$photo2" height="216" width="261">
+        <img alt="photo_3" src="$photo3" height="216" width="261">
+        <img alt="photo_4" src="$photo4" height="216" width="261"> 
       </div>
     </div>
-    <div class="tab">
-      <input id="tab-4" name="tab-group-1" type="radio"></input>
-      <label for="tab-4">Comments</label>
-      <div class="content">
-  <div>User: </div>
-  <div id="opinions">Comment:</div>
-  <textarea class="text" id="comment" name="comment" placeholder= "Enter your news comments here" cols="32" rows="5"></textarea> </div>
+  </div>
+  <div class="tab">
+    <input id="tab-4" name="tab-group-1" type="radio" /> <label for="tab-4">
+    Comments</label>
+    <div class="content">
+      <p id="users">
+        User: </p>
+      <p id="opinions">
+        Comment:</p>
+      <textarea id="comment" class="text" cols="32" name="comment" placeholder="Enter your news comments here" rows="5"></textarea>
     </div>
-  </div>            
+  </div>
+</div>        
   ''';
   
   divEle.add(content);
@@ -716,7 +748,7 @@ processPNG(String data) {
         }
         else
         {
-          print('Wrong Format!');
+          print('Wrong PNG Data Format!');
         }
       newsRows.add(newsRow);
       //print(newsRow.forEach((value)=>print(value)));

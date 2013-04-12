@@ -5,20 +5,23 @@ part of stream;
 
 ///Skeletal implementation
 abstract class _AbstractConnect implements HttpConnect {
-  final ConnectErrorHandler _cxerrh;
-  ErrorHandler _errh;
-  Handler _close;
+  final ConnectErrorCallback _cxerrh;
+  ErrorCallback _errh;
+  VoidCallback _close;
   Map<String, dynamic> _dataset;
+  final _StreamTarget<HttpConnect> _closeEvtTarget = new _StreamTarget<HttpConnect>();
+  _StreamTarget _errEvtTarget;
  
   _AbstractConnect(this.request, this.response, this._cxerrh) {
     _init();
   }
   void _init() {
     _close = () {
-      on.close._invoke0();
+      _closeEvtTarget.send(this);
     };
     _errh = (e, [st]) {
-      on.error._invoke2(e, st);
+      if (_errEvtTarget != null)
+        _errEvtTarget.send(st != null ? new AsyncError(e, st): e);
       _cxerrh(this, e, st);
     };
   }
@@ -37,26 +40,30 @@ abstract class _AbstractConnect implements HttpConnect {
   bool get isForwarded => false;
 
   @override
-  void forward(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void forward(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     server.forward(this, uri, success: success, request: request, response: response);
   }
   @override
-  void include(String uri, {Handler success, HttpRequest request, HttpResponse response}) {
+  void include(String uri, {VoidCallback success, HttpRequest request, HttpResponse response}) {
     server.include(this, uri, success: success, request: request, response: response);
   }
 
   @override
-  final Handlers on = new Handlers();
+  VoidCallback get close => _close;
   @override
-  Handler get close => _close;
+  ErrorCallback get error => _errh;
   @override
-  ErrorHandler get error => _errh;
+  Stream<HttpConnect> get onClose => _provider.forTarget(_closeEvtTarget);
+  @override
+  Stream get onError
+  => _provider.forTarget(_errEvtTarget != null ? _errEvtTarget:
+      (_errEvtTarget = new _StreamTarget()));
 }
 
 ///The default implementation of HttpConnect
 class _HttpConnect extends _AbstractConnect {
   _HttpConnect(StreamServer server, HttpRequest request, HttpResponse response):
-      this.server = server, super(request, response, server.defaultErrorHandler);
+      this.server = server, super(request, response, server.defaultErrorCallback);
 
   @override
   final StreamServer server;
@@ -72,7 +79,7 @@ class _ProxyConnect extends _AbstractConnect {
 
   ///[uri]: if null, it means no need to change
   _ProxyConnect(HttpConnect origin, HttpRequest request, HttpResponse response):
-      _origin = origin, super(request, response, origin.server.defaultErrorHandler);
+      _origin = origin, super(request, response, origin.server.defaultErrorCallback);
 
   @override
   StreamServer get server => _origin.server;
@@ -141,14 +148,11 @@ class _IncludedResponse extends HttpResponseWrapper {
 
   HttpHeaders _headers;
 
+  //Note: we don't override set:statusCode since we have to report the error
+  //back to the browser if it happens in the included renderer
+
   @override
   void set contentLength(int contentLength) {
-  }
-  @override
-  void set statusCode(int statusCode) {
-  }
-  @override
-  void set reasonPhrase(String reasonPhrase) {
   }
 
   @override
@@ -205,3 +209,29 @@ HttpRequest _wrapRequest(HttpRequest request, String uri)
 => uri == null || request.uri == uri ? request: new _ReUriRequest(request, new Uri(uri));
 HttpResponse _wrapResponse(HttpResponse response, bool included)
 => !included || response is _IncludedResponse ? response: new _IncludedResponse(response);
+
+//Close and error stream (for implementing HttpConnect.onClose and onError)
+class _StreamTarget<T> implements StreamTarget<T> {
+  List<Function> _listeners;
+
+  _StreamTarget();
+
+  void send(T event) {
+    if (_listeners != null)
+      for (final l in _listeners)
+        l(event);
+  }
+
+  @override
+  void addEventListener(String type, void listener(T event)) {
+    if (_listeners == null)
+      _listeners = [];
+    _listeners.insert(0, listener);
+  }
+  @override
+  void removeEventListener(String type, void listener(T event)) {
+    if (_listeners != null)
+      _listeners.remove(listener);
+  }
+}
+const StreamProvider _provider = const StreamProvider('');

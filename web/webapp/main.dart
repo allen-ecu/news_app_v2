@@ -7,7 +7,7 @@ library server;
 import 'dart:io';
 import 'dart:async';
 import 'dart:json' as Json;
-import 'package:stream/stream.dart';
+import "package:stream/stream.dart";
 import 'package:xml/xml.dart' as xml;
 import 'package:unittest/unittest.dart';
 import 'package:rikulo_commons/mirrors.dart';
@@ -25,9 +25,10 @@ class NewsInfo {
   NewsInfo(this.title, this.description, this.photo, this.time, this.ip);
 }
 
+
 void main() {
   new StreamServer(uriMapping: _mapping, errorMapping: _errormapping)
-  ..port = 'http://newsapp2.herokuapp.com'
-  ..host = '80'
+  ..port = 5050
+  ..host = '10.1.1.3'
   ..start();
 }

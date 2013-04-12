@@ -59,6 +59,16 @@ class XmlCollection<E extends XmlNode> implements List<E> {
   void addAll(Iterable<E> iterable) => _collection.addAll(iterable);
 
   /**
+   * Returns a new list containing the elemenst from [start] to [end].
+   *
+   * If [end] is omitted, the [length] of the list is used.
+   *
+   * It is an error if [start] or [end] are not list indices for this list,
+   * or if [end] is before [start].
+   */
+  List<E> sublist(int start, [int end]) => _collection.sublist(start, end);
+
+  /**
    * Returns a reversed fixed-length view of this [List].
    *
    * The reversed list has elements in the opposite order of this list.
@@ -165,17 +175,6 @@ class XmlCollection<E extends XmlNode> implements List<E> {
   E removeLast() => _collection.removeLast();
 
   /**
-   * Returns a new list containing [length] elements from the list,
-   * starting at  [start].
-   * Returns an empty list if [length] is 0.
-   * Throws an [ArgumentError] if [length] is negative.
-   * Throws an [RangeError] if [start] or
-   * [:start + length - 1:] are out of range.
-   */
-  List<E> getRange(int start, int length) =>
-      _collection.getRange(start, length);
-
-  /**
    * Copies [length] elements of [from], starting
    * at [startFrom], into the list, starting at [start].
    * If [length] is 0, this method does not do anything.
@@ -260,23 +259,6 @@ class XmlCollection<E extends XmlNode> implements List<E> {
    */
   void retainAll(Iterable elements) => _collection.retainAll(elements);
 
-  /**
-   * Removes all elements of this collection that satisfy [test].
-  *
-   * An elements [:e:] satisfies [test] if [:test(e):] is true.
-   */
-  void removeMatching(bool test(E element)) =>
-      _collection.removeMatching(test);
-
-  /**
-   * Removes all elements of this collection that fail to satisfy [test].
-  *
-   * An elements [:e:] satisfies [test] if [:test(e):] is true.
-   */
-  void retainMatching(bool test(E element)) =>
-      _collection.retainMatching(test);
-
-
   // From [Iterable].
 
   /**
@@ -355,32 +337,6 @@ class XmlCollection<E extends XmlNode> implements List<E> {
   int get length => _collection.length;
 
   /**
-   * Find the least element in the iterable.
-   *
-   * Returns null if the iterable is empty.
-   * Otherwise returns an element [:x:] of this [Iterable] so that
-   * [:x:] is not greater than [:y:] (that is, [:compare(x, y) <= 0:]) for all
-   * other elements [:y:] in the iterable.
-   *
-   * The [compare] function must be a proper [Comparator<T>]. If a function is
-   * not provided, [compare] defaults to [Comparable.compare].
-   */
-  E min([int compare(E a, E b)]) => _collection.min(compare);
-
-  /**
-   * Find the largest element in the iterable.
-   *
-   * Returns null if the iterable is empty.
-   * Otherwise returns an element [:x:] of this [Iterable] so that
-   * [:x:] is not smaller than [:y:] (that is, [:compare(x, y) >= 0:]) for all
-   * other elements [:y:] in the iterable.
-   *
-   * The [compare] function must be a proper [Comparator<T>]. If a function is
-   * not provided, [compare] defaults to [Comparable.compare].
-   */
-  E max([int compare(E a, E b)]) => _collection.max(compare);
-
-  /**
    * Returns true if there is no element in this collection.
    */
   bool get isEmpty => _collection.isEmpty;
@@ -446,32 +402,6 @@ class XmlCollection<E extends XmlNode> implements List<E> {
   E get single => _collection.single;
 
   /**
-   * Returns the first element that satisfies the given predicate [f].
-   *
-   * If none matches, the result of invoking the [orElse] function is
-   * returned. By default, when [orElse] is `null`, a [StateError] is
-   * thrown.
-   */
-  E firstMatching(bool test(E value), { E orElse() }) =>
-      _collection.firstMatching(test, orElse: orElse);
-
-  /**
-   * Returns the last element that satisfies the given predicate [f].
-   *
-   * If none matches, the result of invoking the [orElse] function is
-   * returned. By default, when [orElse] is [:null:], a [StateError] is
-   * thrown.
-   */
-  E lastMatching(bool test(E value), {E orElse()}) =>
-      _collection.lastMatching(test, orElse: orElse);
-
-  /**
-   * Returns the single element that satisfies [f]. If no or more than one
-   * element match then a [StateError] is thrown.
-   */
-  E singleMatching(bool test(E value)) => _collection.singleMatching(test);
-
-  /**
    * Returns the [index]th element.
    *
    * If [this] [Iterable] has fewer than [index] elements throws a
@@ -482,6 +412,58 @@ class XmlCollection<E extends XmlNode> implements List<E> {
    * at least [index] elements in [this].
    */
   E elementAt(int index) => _collection.elementAt(index);
+
+  /**
+   * Returns the first element that satisfies the given predicate [f].
+   *
+   * If none matches, the result of invoking the [orElse] function is
+   * returned. By default, when [orElse] is `null`, a [StateError] is
+   * thrown.
+   */
+  E firstWhere(bool test(E value), { E orElse() }) =>
+      _collection.firstWhere(test, orElse:orElse);
+
+  /**
+   * Returns the last element that satisfies the given predicate [f].
+   *
+   * If none matches, the result of invoking the [orElse] function is
+   * returned. By default, when [orElse] is [:null:], a [StateError] is
+   * thrown.
+   */
+  E lastWhere(bool test(E value), {E orElse()}) =>
+      _collection.lastWhere(test, orElse:orElse);
+
+  /**
+   * Returns the single element that satisfies [f]. If no or more than one
+   * element match then a [StateError] is thrown.
+   */
+  E singleWhere(bool test(E value)) => _collection.singleWhere(test);
+
+  /**
+   * Removes all elements of this collection that satisfy [test].
+   *
+   * An elements [:e:] satisfies [test] if [:test(e):] is true.
+   */
+  void removeWhere(bool test(E element)) => _collection.removeWhere(test);
+
+  /**
+   * Removes all elements of this collection that fail to satisfy [test].
+   *
+   * An elements [:e:] satisfies [test] if [:test(e):] is true.
+   */
+  void retainWhere(bool test(E element)) => _collection.retainWhere(test);
+
+  /**
+   * Inserts the element at position [index] in the list.
+   *
+   * This increases the length of the list by one and shifts all later elements
+   * towards the end of the list.
+   *
+   * It is an error if the [index] does not point inside the list or at the
+   * position after the last element.
+   */
+  void insert(int index, E element) => _collection.insert(index, element);
+
 
 
 //  /**

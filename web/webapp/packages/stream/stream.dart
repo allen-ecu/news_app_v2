@@ -6,19 +6,19 @@ library stream;
 
 import "dart:io";
 import "dart:async";
-import "dart:collection";
+import "dart:collection" show HashMap;
 import "dart:uri";
-import "dart:mirrors";
 import 'package:meta/meta.dart';
 import 'package:args/args.dart' show Options;
 import "package:logging/logging.dart" show Logger;
 
 import "package:rikulo_commons/util.dart";
 import "package:rikulo_commons/io.dart";
-import "package:rikulo_commons/mirrors.dart";
+import "package:rikulo_commons/async.dart";
 
 import "plugin.dart";
 
 part "src/connect.dart";
-part "src/connect_impl.dart";
 part "src/server.dart";
+part "src/connect_impl.dart";
+part "src/server_impl.dart";

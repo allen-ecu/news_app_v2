@@ -1,24 +1,37 @@
 Change Log:
 V2.8
----------------------
-How to deploy dart to Heroku
-1. make sure you add your ssh key to the heroku app settings and github account settings ssh
-2. open git bash
-3. cd mynews2
-4. git status
-5.git add .
-6.git pull
-[
-7.
-heroku create myapp_name -s cedar
-heroku config:add BUILDPACK_URL=https://github.com/igrigorik/heroku-buildpack-dart.git
-heroku config:add BUILD=21094
-]
-8.git push heroku master
-9.make sure you have Procfile in the root path together with pubspec.yaml
-10. git remote -v
-11. git remote rm xxx
-12.git remote add xxx git@heroku.com:mapapp2.git
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+N/A
+
+Next:
+-------------------------------
+Restrict the data up to today
+Create List
+Redesign html
+Save date to WebDB or IndexedDB
+Load news from DB and send to client
+
+What has changed?
+-------------------------------
+Allow to upload photos in loop
+Click on icon to open InfoWindow, click on icon to close InfoWindow
+Only one InfoWindow instance is allowed
+Environment prerequisite:
+Steam upgraded to v0.6.2
+Dart Editor 0.4.3_r20602
+Dat SDK 0.4.3.5_r26062
+Server: main.dart
+Client: 10.1.1.11:5050
+The localhost has changed to 10.1.1.11:5050 for testing in my case.
+You must use r20602 version and Stream v0.6.2 to in order to run the codes correctly.
+
+Versions:
+-------------------------------
+Last Version: V2.7
+This Version: V2.8
+
 Change Log:
 V2.7 (M1)
 ------------------------------------------------------------------

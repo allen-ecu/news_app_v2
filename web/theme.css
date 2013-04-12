@@ -109,6 +109,7 @@ tr #info {
 /*overview tab */
 #infotitle {
   height: 33px;
+  padding: 2px;
   border-bottom-style: inset;
   border-bottom-width: thin;
   border-bottom-color: #CCCCCC;
@@ -118,25 +119,18 @@ tr #info {
   width: 250px;
 }
 #infotime {
-  width: 22%;
-  border-bottom-style: inset;
-  border-bottom-width: thin;
-  border-bottom-color: #CCCCCC;
+  width: 100%;
+  padding:2px;
 }
 #infodesc {
   text-align:justify;
-  width: 35%;
-  border-left-style: inset;
-  border-left-width: thin;
-  border-left-color: #CCCCCC;
-  padding: 3px;
+  width: 100%;
 }
 /*css tab */
 .tabs {
   position: relative;
   min-height: 245px;
   clear: both;
-  margin: 15px 0;
 }
 .tab {
   float: left;
@@ -163,6 +157,7 @@ tr #info {
   bottom: 0;
   border: 1px solid #ffcc66;
   width: 261px;
+  font-size: small;
 }
 [type=radio]:checked ~ label {
   background: #fff;
@@ -318,11 +313,32 @@ tr #info {
  height:63px;
  display: inline-block;
 }
-td img {
+.a4 {
  border: 1px solid #C0C0C0;
  padding: 2px;
  margin-right: 4px;
 }
 .redborder {
  border: 1px solid #FF0000;
+}
+#infodes {
+  width: 150px;
+  height: 50px;
+  padding: 2px;
+}
+#cover {
+  padding: 2px;
+  width: 90px;
+  height: 90px;
+  float: right;
+}
+#detail {
+  padding: 4px;
+  width: 253px;
+}
+div p {
+  padding: 2px;
+}
+#comment {
+  padding: 2px;
 }
