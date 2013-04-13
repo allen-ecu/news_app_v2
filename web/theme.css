@@ -318,8 +318,8 @@ tr #info {
  padding: 2px;
  margin-right: 4px;
 }
-.redborder {
- border: 1px solid #FF0000;
+.highlightborder {
+ border: 1px solid #0099FF;
 }
 #infodes {
   width: 150px;

@@ -92,21 +92,27 @@ void main() {
   
   //submit user input(JSON) to the server
   query('#submit').onClick.listen((e){
-  ajaxSendJSON();
-  
-  resetElement('#title');
-  resetElement('#description');
-  resetElement('#time');
-  int l = photoData.length;
-  for(int i = 0 ; i < l; i++)
+  //do something after submit failed
+  if(ajaxSendJSON())
   {
-    resetImages(i+1);
-    index = 0;
-    photoData.clear();
+    resetElement('#title');
+    resetElement('#description');
+    resetElement('#time');
+    int l = photoData.length;
+    for(int i = 0 ; i < l; i++)
+    {
+      resetImages(i+1);
+      index = 0;
+      photoData.clear();
+    }
   }
-  //ajaxGetJSON();
+  //do something after submit succeeded
+  else
+  {
+    ajaxGetJSON();
+    ajaxGetPNG();
+  }
   });
-  
 }
 
 void resetElement(String cId) {
@@ -205,13 +211,13 @@ void drawIMG(iD, ImageElement img) {
 void showIMG(var iD, var data) {
   var sub = iD.substring(6);
   //show red border when mouse over
-  showRedBorder(id){
+  showHighlightedBorder(id){
     query('#IMG_$id').classes.remove('greyborder');
-    query('#IMG_$id').classes.add('redborder');
+    query('#IMG_$id').classes.add('highlightborder');
   }
   //show grey border when mouse out
   showGreyBorder(id){
-    query('#IMG_$id').classes.remove('redborder');
+    query('#IMG_$id').classes.remove('highlightborder');
     query('#IMG_$id').classes.add('greyborder');
   }
   
@@ -246,7 +252,7 @@ void showIMG(var iD, var data) {
   ..width = widthIMG
   ..height = heightIMG
   ..onMouseOut.listen((e) => showGreyBorder(sub))
-  ..onMouseOver.listen((e) => showRedBorder(sub))
+  ..onMouseOver.listen((e) => showHighlightedBorder(sub))
   ..onDragStart.listen((e) => dragf(e))
   ..onDragOver.listen((e) => e.preventDefault())
   ..onDrop.listen((e) => dropf(e));
@@ -271,15 +277,7 @@ void validNumLett(KeyboardEvent e) {
   }
 }
 
-loadEnd(HttpRequest request) {
-  if (request.status != 200) {
-    print('Uh oh, there was an error.');
-  } else {
-    print('Data has been posted');
-  }
-}
-
-void ajaxSendJSON()
+bool ajaxSendJSON()
 {
   String jsonData = mapStringJSON();
   bool pngData = mapImageJSON();
@@ -299,7 +297,7 @@ void ajaxSendJSON()
     query('#info').replaceWith(elem);
     }
     
-    _sendJSON(jsonData);
+    _sendJSON('POST', '/send', jsonData);
     
     int len = photoData.length;
     if(len > 4)//send first four photos only
@@ -310,7 +308,9 @@ void ajaxSendJSON()
     String tmp = photoData[i];
     input = '$input$tmp';
     }
-    _sendPNG(input);
+    _sendPNG('POST','/png', input);
+    
+    return true;
   }
   else
   {
@@ -325,10 +325,12 @@ void ajaxSendJSON()
     {
     query('#info').replaceWith(elem);
     }
+    
+    return false;
   }
 }
 
-void _sendJSON(String jsonData) {
+void _sendJSON(String method, String url,String jsonData) {
   HttpRequest request = new HttpRequest(); // create a new XHR
   // add an event handler that is called when the request finishes
   request.onReadyStateChange.listen((_) 
@@ -342,13 +344,12 @@ void _sendJSON(String jsonData) {
     );
   // POST the data to the server Async
   print('Sending JSON to the server...');
-  var url = "/send";
-  request.open("POST", url);
+  request.open(method, url);
   request.setRequestHeader("Content-Type", "application/json");
   request.send(jsonData);
 }
 
-void _sendPNG(String pngData) {
+void _sendPNG(String method, String url, String pngData) {
   HttpRequest request = new HttpRequest(); // create a new XHR
   // add an event handler that is called when the request finishes
   request.onReadyStateChange.listen((_) 
@@ -362,8 +363,7 @@ void _sendPNG(String pngData) {
     );
   // POST the data to the server Async
   print('Sending Photos to the server...');
-  var url = "/png";
-  request.open("POST", url);
+  request.open(method, url);
   request.setRequestHeader("Content-Type", "text/plain");
   request.send(pngData);
 }
@@ -492,7 +492,7 @@ void loadMap(List<Map> data, List<List<String>> album, var MarkerImage) {
       String vUserTime = len==0? null:data[i]['time'];
       
       //setup info windows
-      setupContent(vTitle, vUserTime, vDescription, vPhoto, divEle);
+      infoContent(vTitle, vUserTime, vDescription, vPhoto, divEle);
       
       var infoWindow = new gm.InfoWindow(
           new gm.InfoWindowOptions()
@@ -536,7 +536,7 @@ void loadMap(List<Map> data, List<List<String>> album, var MarkerImage) {
   });
 }
 
-void setupContent(String vTitle, String vUserTime, String vDescription, List<String> vPhoto, List<DivElement> divEle) {
+void infoContent(String vTitle, String vUserTime, String vDescription, List<String> vPhoto, List<DivElement> divEle) {
   var content = new DivElement();
   String cover = vPhoto[0];
 

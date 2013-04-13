@@ -28,27 +28,49 @@ $$.main_anon0 = {"": "Closure;",
 $$.main_anon1 = {"": "Closure;",
   call$1: function(e) {
     var l, i;
-    $.ajaxSendJSON();
-    $.set$value$x(document.querySelector("#title"), null);
-    $.set$value$x(document.querySelector("#description"), null);
-    $.set$value$x(document.querySelector("#time"), null);
-    l = $.get$length$asx($.get$photoData());
-    if (typeof l !== "number")
-      return this.call$1$bailout(1, l);
-    for (i = 0; i < l;) {
-      ++i;
-      $.resetImages(i);
-      $.index = 0;
-      $.clear$0$ax($.get$photoData());
+    if ($.ajaxSendJSON()) {
+      $.set$value$x(document.querySelector("#title"), null);
+      $.set$value$x(document.querySelector("#description"), null);
+      $.set$value$x(document.querySelector("#time"), null);
+      l = $.get$length$asx($.get$photoData());
+      if (typeof l !== "number")
+        return this.call$1$bailout(1, l);
+      for (i = 0; i < l;) {
+        ++i;
+        $.resetImages(i);
+        $.index = 0;
+        $.clear$0$ax($.get$photoData());
+      }
+    } else {
+      $.HttpRequest_getString("/receive", null, null).then$1($.processString);
+      $.HttpRequest_getString("/pngReceive", null, null).then$1($.processPNG);
     }
   },
   call$1$bailout: function(state0, l) {
-    var i;
-    for (i = 0; $.JSNumber_methods.$lt(i, l);) {
-      ++i;
-      $.resetImages(i);
-      $.index = 0;
-      $.clear$0$ax($.get$photoData());
+    switch (state0) {
+      case 0:
+      case 1:
+        var i;
+        if (state0 === 1 || state0 === 0 && $.ajaxSendJSON())
+          switch (state0) {
+            case 0:
+              $.set$value$x(document.querySelector("#title"), null);
+              $.set$value$x(document.querySelector("#description"), null);
+              $.set$value$x(document.querySelector("#time"), null);
+              l = $.get$length$asx($.get$photoData());
+            case 1:
+              state0 = 0;
+              for (i = 0; $.JSNumber_methods.$lt(i, l);) {
+                ++i;
+                $.resetImages(i);
+                $.index = 0;
+                $.clear$0$ax($.get$photoData());
+              }
+          }
+        else {
+          $.HttpRequest_getString("/receive", null, null).then$1($.processString);
+          $.HttpRequest_getString("/pngReceive", null, null).then$1($.processPNG);
+        }
     }
   }
 };
@@ -112,14 +134,14 @@ $$.getIMAGE__anon0 = {"": "Closure;reader_2",
   }
 };
 
-$$.showIMG_showRedBorder = {"": "Closure;",
+$$.showIMG_showHighlightedBorder = {"": "Closure;",
   call$1: function(id) {
     var t1 = "#IMG_" + $.S(id);
     t1 = $.get$classes$x(document.querySelector(t1));
     t1.remove$1(t1, "greyborder");
     t1 = "#IMG_" + $.S(id);
     t1 = $.get$classes$x(document.querySelector(t1));
-    t1.add$1(t1, "redborder");
+    t1.add$1(t1, "highlightborder");
   }
 };
 
@@ -127,7 +149,7 @@ $$.showIMG_showGreyBorder = {"": "Closure;",
   call$1: function(id) {
     var t1 = "#IMG_" + $.S(id);
     t1 = $.get$classes$x(document.querySelector(t1));
-    t1.remove$1(t1, "redborder");
+    t1.remove$1(t1, "highlightborder");
     t1 = "#IMG_" + $.S(id);
     t1 = $.get$classes$x(document.querySelector(t1));
     t1.add$1(t1, "greyborder");
@@ -169,9 +191,9 @@ $$.showIMG_anon = {"": "Closure;sub_0,showGreyBorder_1",
   }
 };
 
-$$.showIMG_anon0 = {"": "Closure;sub_2,showRedBorder_3",
+$$.showIMG_anon0 = {"": "Closure;sub_2,showHighlightedBorder_3",
   call$1: function(e) {
-    return this.showRedBorder_3.call$1(this.sub_2);
+    return this.showHighlightedBorder_3.call$1(this.sub_2);
   }
 };
 
@@ -319,7 +341,7 @@ $$.loadMap_anon = {"": "Closure;data_2,album_3",
           throw $.ioore(t5);
         vUserTime = $.$index$asx(t2[t5], "time");
       }
-      $.setupContent(vTitle, vUserTime, vDescription, vPhoto, divEle);
+      $.infoContent(vTitle, vUserTime, vDescription, vPhoto, divEle);
       t5 = $.InfoWindowOptions$();
       t6 = box_0.i_0;
       if (t6 !== (t6 | 0))
@@ -418,7 +440,7 @@ $$.loadMap_anon = {"": "Closure;data_2,album_3",
               throw $.ioore(t6);
             vPhoto = t5[t6];
           }
-          $.setupContent(vTitle, t3.$eq(len, 0) === true ? null : $.$index$asx(t4.$index(t2, box_0.i_0), "time"), vDescription, vPhoto, divEle);
+          $.infoContent(vTitle, t3.$eq(len, 0) === true ? null : $.$index$asx(t4.$index(t2, box_0.i_0), "time"), vDescription, vPhoto, divEle);
           t6 = $.InfoWindowOptions$();
           t7 = box_0.i_0;
           if (t7 !== (t7 | 0))
@@ -14038,7 +14060,7 @@ $.getIMAGE = function(uploadInput) {
 $.showIMG = function(iD, data) {
   var img, e, sub, t1, t2, t3, t4, img0, t5, exception;
   sub = $.substring$1$s(iD, 6);
-  t1 = new $.showIMG_showRedBorder();
+  t1 = new $.showIMG_showHighlightedBorder();
   t2 = new $.showIMG_showGreyBorder();
   t3 = new $.showIMG_dragf();
   t4 = new $.showIMG_dropf();
@@ -14093,7 +14115,7 @@ $.ajaxSendJSON = function() {
       $.replaceWith$1$x(document.querySelector("#error"), elem);
     if (document.querySelector("#info") != null)
       $.replaceWith$1$x(document.querySelector("#info"), elem);
-    $._sendJSON(jsonData);
+    $._sendJSON("POST", "/send", jsonData);
     len = $.get$length$asx($.get$photoData());
     if ($.$gt$n(len, 4) === true)
       len = 4;
@@ -14103,7 +14125,8 @@ $.ajaxSendJSON = function() {
       tmp = $.$index$asx($.get$photoData(), i);
       input = $.S(input) + $.S(tmp);
     }
-    $._sendPNG(input);
+    $._sendPNG("POST", "/png", input);
+    return true;
   } else {
     elem = document.createElement("label");
     $.set$id$x(elem, "error");
@@ -14112,6 +14135,7 @@ $.ajaxSendJSON = function() {
       $.replaceWith$1$x(document.querySelector("#ok"), elem);
     if (document.querySelector("#info") != null)
       $.replaceWith$1$x(document.querySelector("#info"), elem);
+    return false;
   }
 };
 
@@ -14132,7 +14156,7 @@ $.ajaxSendJSON$bailout = function(state0, len) {
               $.replaceWith$1$x(document.querySelector("#error"), elem);
             if (document.querySelector("#info") != null)
               $.replaceWith$1$x(document.querySelector("#info"), elem);
-            $._sendJSON(jsonData);
+            $._sendJSON("POST", "/send", jsonData);
             len = $.get$length$asx($.get$photoData());
             if ($.$gt$n(len, 4) === true)
               len = 4;
@@ -14142,7 +14166,8 @@ $.ajaxSendJSON$bailout = function(state0, len) {
               tmp = $.$index$asx($.get$photoData(), i);
               input = $.S(input) + $.S(tmp);
             }
-            $._sendPNG(input);
+            $._sendPNG("POST", "/png", input);
+            return true;
         }
       else {
         elem = document.createElement("label");
@@ -14152,28 +14177,29 @@ $.ajaxSendJSON$bailout = function(state0, len) {
           $.replaceWith$1$x(document.querySelector("#ok"), elem);
         if (document.querySelector("#info") != null)
           $.replaceWith$1$x(document.querySelector("#info"), elem);
+        return false;
       }
   }
 };
 
-$._sendJSON = function(jsonData) {
+$._sendJSON = function(method, url, jsonData) {
   var request, t1;
   request = new XMLHttpRequest();
   t1 = $.getInterceptor$x(request);
   t1.get$onReadyStateChange(request).listen$1(new $._sendJSON_anon(request));
   $.Primitives_printString("Sending JSON to the server...");
-  t1.open$2(request, "POST", "/send");
+  t1.open$2(request, method, url);
   request.setRequestHeader("Content-Type", "application/json");
   request.send(jsonData);
 };
 
-$._sendPNG = function(pngData) {
+$._sendPNG = function(method, url, pngData) {
   var request, t1;
   request = new XMLHttpRequest();
   t1 = $.getInterceptor$x(request);
   t1.get$onReadyStateChange(request).listen$1(new $._sendPNG_anon(request));
   $.Primitives_printString("Sending Photos to the server...");
-  t1.open$2(request, "POST", "/png");
+  t1.open$2(request, method, url);
   request.setRequestHeader("Content-Type", "text/plain");
   request.send(pngData);
 };
@@ -14210,7 +14236,7 @@ $.loadMap = function(data, album, MarkerImage) {
   $.scoped(new $.loadMap_anon(data, album));
 };
 
-$.setupContent = function(vTitle, vUserTime, vDescription, vPhoto, divEle) {
+$.infoContent = function(vTitle, vUserTime, vDescription, vPhoto, divEle) {
   var cover, photo1, photo2, photo3, photo4, len, $content, exception;
   $content = document.createElement("div");
   cover = $.$index$asx(vPhoto, 0);
