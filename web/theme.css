@@ -1,23 +1,25 @@
 * {
-	line-height: 1.6;
+	line-height: 1.3;
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 h1 {
   font-size: 20px;
-  margin: 10px;
+  margin: 2px;
 }
 h2 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: bold;
-  margin: 10px;
+  background-color: #33CCFF;
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
 }
 h3 {
   font-size: 13px;
-  margin: 10px;
+  margin: 2px;
 }
 p {
   font-size: 12px;
-  margin: 10px;
+  margin: 2px;
 }
 b {
   font-weight: bold;
@@ -33,65 +35,65 @@ b {
   font-family: "Times New Roman", Times, serif;
   color: #666666;
   border-width: thin;
-  margin-left:10px;
+  margin-left:2px;
   border-bottom-color: #CCCCCC;
   border-bottom-style: dotted;
   font-size: small;
+  margin-top: 220px;
 }
 .sidebar {
   position: absolute; 
   width: 400px;
   min-height: 275px; 
-  margin-top: 20px;
-  margin-left:10px;
-  margin-bottom: 20px;
+  margin-top: 2px;
+  margin-left:2px;
+  margin-bottom: 2px;
   background-color: #fff;
   border: thin solid #C0C0C0;
 }
 .news {
   position: absolute; 
-  width: 400px;
-  min-height: 198px; 
-  margin-top: 416px;
-  margin-left:10px;
-  margin-bottom: 20px;
+  width: auto;
+  min-height: 190px; 
+  margin-top: 495px;
+  margin-left:2px;
+  margin-right:9px;
+  margin-bottom: 2px;
   background-color: #fff;
   border: thin solid #C0C0C0;
 }
 .body {
-  min-height: 593px; 
-  margin-left: 420px;
-  margin-right: 10px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  min-height: 483px; 
+  margin-left: 415px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-bottom: 2px;
   background-color: #fff;
   border: thin solid #C0C0C0;
 }
 label {
 width:50px;
-margin:8px;
+margin:5px;
 }
 
 tr {
   margin:10px;
   }
 table {
-  margin-bottom: 5px;
+  margin-bottom: 1px;
 }
 div #mapholder {
     width: auto;
-    height: 485px;
+    height: 465px;
     position:relative;
-    margin:10px;
-    padding: 10px;
-    border-style: dotted; border-width: thin; border-top-color: 1; border-right-color: 1; border-bottom-color: 1; border-left-color: 1
-  }
+}
 tr td {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: small;
   font-weight: normal;
   font-style: normal;
   color: #000000;
+  background-color: #fff;
 }
 td div {
   font-size: 85%;
@@ -116,7 +118,7 @@ tr #info {
   
 }
 #infotable {
-  width: 250px;
+  width: auto;
 }
 #infotime {
   width: 100%;
@@ -137,7 +139,7 @@ tr #info {
 }
 .tab label {
   background: #fff;
-  padding: 5px;
+  padding: 6px;
   border: 1px solid #ccc;
   margin-left: -1px;
   position: relative;
@@ -150,7 +152,7 @@ tr #info {
 }
 .content {
   position: absolute;
-  top: 27px;
+  top: 25px;
   left: 0;
   background: white;
   right: 0;

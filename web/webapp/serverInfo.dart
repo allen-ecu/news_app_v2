@@ -2,16 +2,21 @@
 //Email: dustonlyperth@gmail.com
 
 part of server;
-var uriXML = 'news.xml';
-var vTitle;
-var vDescription;
-var vPhoto;
-var vTime;
+//String uriXML = 'news.xml';
+String vTitle;
+String vDescription;
+String vPhoto;
+String vTime;
 String id = 'none';
+num itemsperfetch = 4;//min: 1
+num currentpage;
+num totalpage;
+num pageNum = 1;
+List<num> pageIndex = new List<num>();
 
 //NO NEED HttpServer IF YOU ARE USING RIKULO STREAM SERVER, BECAUSE YOU DO NOT NEED TWO SERVERS
 //Receive JSON data from the browser, and save it to local JSON.json file
-void serverInfo(HttpConnect connect){
+void receiveJSON(HttpConnect connect){
   var _cxs = new List<HttpConnect>();
   var request = connect.request;
   var response = connect.response;
@@ -131,24 +136,223 @@ void receivePNG(HttpConnect connect){
 }
 
 //Load local JSON.json data and send it to the browser
-void clientInfo(HttpConnect connect) {
+void sendJSON(HttpConnect connect) {
+  
+  print('News Item Preferred to Fetch: $itemsperfetch');
+  
   var request = connect.request;
   var response = connect.response;
   if(request.uri.path == '/receive' && request.method == 'GET')
   {
-  File jsonDoc = new File('JSON.json');
-  //use Sync method
-  String data = jsonDoc.readAsStringSync();
-  //Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
-  //onFinished.then((stringData) => output = stringData);
-  //to use Async method can't give the value to output
-  connect.response
+    File jsonDoc = new File('JSON.json');
+    //use Sync method
+    String data = jsonDoc.readAsStringSync();
+  
+    //reconstruct news string to news list
+    List<String> newsList = buildNewsList(data);
+    
+    num totalnewslen = newsList.length;
+    print('Total News Items: $totalnewslen');
+    
+    //generate page index
+    pageIndex = generatePageIndex(itemsperfetch, totalnewslen, pageNum);
+    
+    if(pageIndex != null)
+    {
+    //output page index
+    print('Page Index: ');
+    print(pageIndex.toString());
+    
+    //only fetch the 'itemstofetch' number of news of currentpage
+    String dataStr = buildStrToSend(newsList, pageIndex);
+    
+    connect.response
     ..headers.contentType = contentTypes["application/json"]
-    ..write('[$data]');
+    ..write('[$dataStr]');
+    }
+    else
+    {
+      response.write('PageIndex is null!');
+      response.statusCode = HttpStatus.NOT_FOUND;
+    }
   }
   else
   {
     response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
+    response.statusCode = HttpStatus.NOT_FOUND;
+  }
+  connect.close();
+}
+
+String buildStrToSend(List<String> newsList, List<num> pageIndex) {
+  //output data format {...},{...},{...}
+  String dataStr='';
+  
+  for(int i = 0; i< pageIndex.length; i++)
+  {
+    String tmp=newsList[pageIndex[i]];
+    if(dataStr == '')
+    {
+      dataStr ='$tmp';
+    }
+    else
+    {
+      dataStr ='$dataStr,$tmp';
+    }
+  }
+  return dataStr;
+}
+
+List<String> buildNewsList(String data) {
+  List<int> startCol = new List<int>();
+  startCol.add(0);
+  List<int> endCol = new List<int>();
+  int indexI = 0, indexJ = 0;
+  while(indexI !=-1)
+  {
+  int tmp =data.indexOf('{', indexI+1);
+  if(tmp != -1)
+  {
+  startCol.add(tmp);
+  }
+  indexI = tmp;
+  }
+  while(indexJ !=-1)
+  {
+  int tmp =data.indexOf('}', indexJ+1);
+  if(tmp != -1)
+  {
+  endCol.add(tmp);
+  }
+  indexJ = tmp;
+  }
+  
+  //fill news items to a list
+  List<String> newsList = new List<String>();
+  for(int i=0;i<startCol.length;i++)
+  {
+    String slice = data.slice(startCol[i], endCol[i]+1);
+    newsList.add(slice);
+  }
+  return newsList;
+}
+
+List<num> generatePageIndex(num itemsperfetch, num totalnewslen, num pageNum) {
+  
+  if(itemsperfetch == 0)
+  {
+    print('The server needs to fetch at least one news item!');
+    return null;
+  }
+  else if(totalnewslen == 0)
+  {
+    print('The server did not find any news items!');
+    return null;
+  }
+  else
+  {
+        // decide currentpage and totalpage
+        num itemstofetch,currentpages, totalpages;
+        if(itemsperfetch<totalnewslen)
+        {
+          //8<5
+          itemstofetch = itemsperfetch;
+          num tmp = totalnewslen/itemsperfetch;
+          totalpages = tmp.ceil();
+        
+          if(pageNum> 0 && pageNum <= totalpages)
+          {
+            currentpages = pageNum;
+          }
+          else
+          {
+            currentpages = 1;
+          }
+        }
+        else
+        {
+          //5
+          itemstofetch = totalnewslen;
+            currentpages = 1;
+            totalpages = 1;
+        }
+      
+        //debug
+        print('News Item to Fetch: $itemstofetch');
+        print('currentpage: $currentpages');
+        print('totalpages: $totalpages');
+        
+        currentpage = currentpages;
+        totalpage = totalpages;
+        
+        List<num> pageIndex = new List<num>();
+        if(currentpages != totalpages)
+        {
+          for(int i = itemstofetch*(currentpages -1); i<itemstofetch*currentpages; i++)
+          {
+            pageIndex.add(i);
+          }
+        }
+        else
+        {
+          num add =totalnewslen - itemstofetch*(totalpages-1) - 1;
+          for(int i = itemstofetch*(currentpages -1); i<itemstofetch*(currentpages -1)+add+1; i++)
+          {
+            pageIndex.add(i);
+          }
+        }
+        return pageIndex;
+  }
+}
+
+void receiveInfo(HttpConnect connect){
+  var _cxs = new List<HttpConnect>();
+  var request = connect.request;
+  var response = connect.response;
+  String ip = request.connectionInfo.remoteHost;
+  if(request.uri.path == '/sendinfo' && request.method == 'POST')
+  { 
+    String res;
+    var stream = request.transform(new StringDecoder());
+    saveINFO()
+    {
+       pageNum = int.parse(res);
+       print('Asking for Page: $pageNum');
+    }
+    
+    stream.listen((String value){
+      //save data to string progressively
+      res = value;
+      },
+      onDone:() => saveINFO(),
+      onError:(error) => print(error)
+    );
+    connect.close();
+  }
+  else
+  {
+    response.write('Receive Page Info Error!');
+    response.statusCode = HttpStatus.NOT_FOUND;
+    connect.close();
+  }
+}
+
+void sendInfo(HttpConnect connect) {
+  var request = connect.request;
+  var response = connect.response;
+  if(request.uri.path == '/receiveinfo' && request.method == 'GET')
+  {
+    Map obj = new Map();
+    obj['currentpage'] = pageNum;
+    obj['totalpage'] = totalpage;
+    String data = Json.stringify(obj);
+    connect.response
+    ..headers.contentType = contentTypes["text/plain"]
+    ..write('$data');
+  }
+  else
+  {
+    response.write('Something is wrong!');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
     connect.close();
@@ -158,77 +362,31 @@ void clientInfo(HttpConnect connect) {
 void sendPNG(HttpConnect connect) {
   var request = connect.request;
   var response = connect.response;
-  if(request.uri.path == '/pngReceive' && request.method == 'GET')
+  if(request.uri.path == '/pngreceive' && request.method == 'GET')
   {
     String data, dataFinal;
-  try
-  {
     File jsonDoc = new File('JSON.json');
     data= jsonDoc.readAsStringSync();
     
     //rearrage news string
-    List<int> startCol = new List<int>();
-    startCol.add(0);
-    List<int> endCol = new List<int>();
-    int indexI = 0, indexJ = 0;
-    while(indexI !=-1)
-    {
-    int tmp =data.indexOf('{', indexI+1);
-    if(tmp != -1)
-    {
-    startCol.add(tmp);
-    }
-    indexI = tmp;
-    }
-    while(indexJ !=-1)
-    {
-    int tmp =data.indexOf('}', indexJ+1);
-    if(tmp != -1)
-    {
-    endCol.add(tmp);
-    }
-    indexJ = tmp;
-    }
-
-    //get news list
-    List<String> newsList = new List<String>();
-    for(int i=0;i<startCol.length;i++)
-    {
-      String slice = data.slice(startCol[i], endCol[i]+1);
-      newsList.add(slice);
-    }
-    //get id list
-    List<String> idList = new List<String>();
-    mapNews(String news)
-    {
-      Map idMap = Json.parse(news);
-      idList.add(idMap['id']);
-    }
-    newsList.forEach((String news)=>mapNews(news));
+    List<String> newsList = buildNewsList(data);
+    //fetch page indexed items
+    num newslen = newsList.length;
+    num itemstofetch = itemsperfetch<newslen? itemsperfetch:newslen;
+    List<String> pageItems = new List<String>();
     
-    //idList.forEach((String value)=>print(value));
-    //read each PNG file
-    List<String> pngList = new List<String>();
-    for(int j=0;j<idList.length;j++)
+    if(pageIndex != null)
     {
-    String fileName = idList[j];
-    File jsonDoc = new File('$fileName.news');
-    String temp= jsonDoc.readAsStringSync();
-    pngList.add('{$temp}');
+      dataFinal = buildPNGStrtoSend(pageItems, newsList);  
+      connect.response
+      ..headers.contentType = contentTypes["text/plain"]
+      ..write('$dataFinal');
     }
-    String da = pngList.toString();
-    dataFinal = da.slice(1, da.length-1);
-  }
-  catch(e)
-  {
-   print('Parse PNG Data Error: $e');
-  }
-  //Future<String> onFinished = jsonDoc.readAsString(Encoding.UTF_8);
-  //onFinished.then((stringData) => output = stringData);
-  //to use Async method can't give the value to output
-  connect.response
-    ..headers.contentType = contentTypes["text/plain"]
-    ..write('$dataFinal');
+    else
+    {
+      response.write('PageIndex is null!');
+      response.statusCode = HttpStatus.NOT_FOUND;
+    }
   }
   else
   {
@@ -236,4 +394,34 @@ void sendPNG(HttpConnect connect) {
     response.statusCode = HttpStatus.NOT_FOUND;
   }
     connect.close();
+}
+
+String buildPNGStrtoSend(List<String> itemsfetched, List<String> newsList) {
+  //fetch png of indexed page
+  for(int j = 0; j< pageIndex.length; j++)
+  {
+    itemsfetched.add(newsList[pageIndex[j]]);
+  }
+  
+  //get id list
+  List<String> idList = new List<String>();
+  mapNews(String news)
+  {
+    Map idMap = Json.parse(news);
+    idList.add(idMap['id']);
+  }
+  itemsfetched.forEach((String news)=>mapNews(news));
+  
+  //read each PNG file
+  List<String> pngList = new List<String>();
+  for(int j=0;j<idList.length;j++)
+  {
+  String fileName = idList[j];
+  File jsonDoc = new File('$fileName.news');
+  String temp= jsonDoc.readAsStringSync();
+  pngList.add('{$temp}');
+  }
+  String da = pngList.toString();
+  String dataFinal = da.slice(1, da.length-1);
+  return dataFinal;
 }

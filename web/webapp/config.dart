@@ -7,10 +7,12 @@ final PORT = 5050;
 //URI mapping
 var _mapping = {
   "/": home,
-  "/send": serverInfo,
-  "/receive": clientInfo,
+  "/send": receiveJSON,
+  "/receive": sendJSON,
   "/png": receivePNG,
-  "/pngReceive": sendPNG,
+  "/pngreceive": sendPNG,
+  "/receiveinfo": sendInfo,
+  "/sendinfo": receiveInfo
 };
 
 var _errormapping = {

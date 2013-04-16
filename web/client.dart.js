@@ -15,17 +15,68 @@ var $$ = {};
 // Classes
 $$.main_anon = {"": "Closure;",
   call$1: function(e) {
-    $.validNumLett(e);
+    var t1, t2;
+    if ($.$lt$n($.currentpages, $.totalpages) === true) {
+      t1 = $.$add$ns($.currentpages, 1);
+      t2 = $.getInterceptor$n(t1);
+      if (t2.$gt(t1, 0) && t2.$le(t1, $.totalpages)) {
+        $.Primitives_printString("sending pagenum info");
+        $._sendJSON("POST", "/sendinfo", t1, "text/plain");
+      }
+      if ($.resetTable() === true) {
+        $.HttpRequest_getString("/receive", null, null).then$1($.processString);
+        $.HttpRequest_getString("/pngreceive", null, null).then$1($.processPNG);
+        $.Primitives_printString("get information now:");
+        $.HttpRequest_getString("/receiveinfo", null, null).then$1($.processInfo);
+        $.Primitives_printString("currentpages: " + $.S($.currentpages));
+      }
+    } else
+      $.Primitives_printString("You are at last page.");
   }
 };
 
 $$.main_anon0 = {"": "Closure;",
   call$1: function(e) {
-    $.validNumLett(e);
+    var t1, t2;
+    if ($.$gt$n($.currentpages, 1) === true) {
+      t1 = $.$sub$n($.currentpages, 1);
+      t2 = $.getInterceptor$n(t1);
+      if (t2.$gt(t1, 0) && t2.$le(t1, $.totalpages)) {
+        $.Primitives_printString("sending pagenum info");
+        $._sendJSON("POST", "/sendinfo", t1, "text/plain");
+      }
+      if ($.resetTable() === true) {
+        $.HttpRequest_getString("/receive", null, null).then$1($.processString);
+        $.HttpRequest_getString("/pngreceive", null, null).then$1($.processPNG);
+        $.Primitives_printString("get information now:");
+        $.HttpRequest_getString("/receiveinfo", null, null).then$1($.processInfo);
+        $.Primitives_printString("currentpages: " + $.S($.currentpages));
+      }
+    } else
+      $.Primitives_printString("You are at first page.");
   }
 };
 
 $$.main_anon1 = {"": "Closure;",
+  call$1: function(e) {
+    $.validNumLett(e);
+  }
+};
+
+$$.main_anon2 = {"": "Closure;",
+  call$1: function(e) {
+    $.validNumLett(e);
+  }
+};
+
+$$.main_anon3 = {"": "Closure;",
+  call$1: function(e) {
+    $.Primitives_printString("Uploading photos!");
+    $.uploadImages($.get$target$x(e));
+  }
+};
+
+$$.main_anon4 = {"": "Closure;",
   call$1: function(e) {
     var l, i;
     if ($.ajaxSendJSON()) {
@@ -43,7 +94,7 @@ $$.main_anon1 = {"": "Closure;",
       }
     } else {
       $.HttpRequest_getString("/receive", null, null).then$1($.processString);
-      $.HttpRequest_getString("/pngReceive", null, null).then$1($.processPNG);
+      $.HttpRequest_getString("/pngreceive", null, null).then$1($.processPNG);
     }
   },
   call$1$bailout: function(state0, l) {
@@ -69,67 +120,31 @@ $$.main_anon1 = {"": "Closure;",
           }
         else {
           $.HttpRequest_getString("/receive", null, null).then$1($.processString);
-          $.HttpRequest_getString("/pngReceive", null, null).then$1($.processPNG);
+          $.HttpRequest_getString("/pngreceive", null, null).then$1($.processPNG);
         }
     }
   }
 };
 
-$$.getIMAGE_anon = {"": "Closure;uploadInput_0",
-  call$1: function(e) {
-    var files, t1, file, reader;
-    if ($.$lt$n($.index, 4) === true) {
-      files = $.get$files$x(this.uploadInput_0);
-      t1 = $.getInterceptor$asx(files);
-      if ($.$eq(t1.get$length(files), 1) === true) {
-        file = t1.$index(files, 0);
-        reader = new FileReader();
-        $.get$onLoad$x(reader).listen$1(new $.getIMAGE__anon(reader));
-        reader.readAsDataURL(file);
-      }
-    }
-    if ($.$eq($.index, 4) === true) {
-      files = $.get$files$x(this.uploadInput_0);
-      t1 = $.getInterceptor$asx(files);
-      if ($.$eq(t1.get$length(files), 1) === true) {
-        file = t1.$index(files, 0);
-        reader = new FileReader();
-        $.get$onLoad$x(reader).listen$1(new $.getIMAGE__anon0(reader));
-        reader.readAsDataURL(file);
-      }
-    }
-    $.index = $.$add$ns($.index, 1);
-  }
-};
-
-$$.getIMAGE__anon = {"": "Closure;reader_1",
+$$.uploadImages_anon = {"": "Closure;reader_0",
   call$1: function(e) {
     var t1, t2;
     t1 = $.get$photoData();
-    t2 = this.reader_1;
+    t2 = this.reader_0;
     $.add$1$ax(t1, t2.result);
     $.data = t2.result;
     $.showIMG("#photo" + $.S($.index), $.data);
   }
 };
 
-$$.getIMAGE__anon0 = {"": "Closure;reader_2",
+$$.uploadImages_anon0 = {"": "Closure;reader_1",
   call$1: function(e) {
-    var t1, t2, img4, img3, img2;
+    var t1, t2;
     t1 = $.get$photoData();
-    t2 = this.reader_2;
+    t2 = this.reader_1;
     $.add$1$ax(t1, t2.result);
     $.data = t2.result;
-    img4 = document.querySelector("#IMG_4");
-    img3 = document.querySelector("#IMG_3");
-    img2 = document.querySelector("#IMG_2");
-    t2 = $.getInterceptor$x(img2);
-    $.set$src$x(document.querySelector("#IMG_1"), t2.get$src(img2));
-    t1 = $.getInterceptor$x(img3);
-    t2.set$src(img2, t1.get$src(img3));
-    t2 = $.getInterceptor$x(img4);
-    t1.set$src(img3, t2.get$src(img4));
-    t2.set$src(img4, $.data);
+    $.swapImage();
     $.index = $.$sub$n($.index, 1);
   }
 };
@@ -229,23 +244,9 @@ $$._sendJSON_anon = {"": "Closure;request_0",
   }
 };
 
-$$._sendPNG_anon = {"": "Closure;request_0",
-  call$1: function(_) {
-    var t1, t2;
-    t1 = this.request_0;
-    if (t1.readyState === 4) {
-      t2 = t1.status;
-      t2 = t2 === 200 || t2 === 0;
-    } else
-      t2 = false;
-    if (t2)
-      $.Primitives_printString($.toString$0(t1.responseText));
-  }
-};
-
 $$.loadMap_anon = {"": "Closure;data_2,album_3",
   call$0: function() {
-    var t1, t2, latlng, request, mapOptions, makerShape, markerIcon, markerIconShadow, divEle, infoWind, gooMarker, latLongs, len, box_0, t3, t4, box_00, latlong, t5, t6, vTitle, vDescription, vPhoto, vUserTime, t7;
+    var t1, t2, latlng, request, mapOptions, makerShape, markerIcon, markerIconShadow, divEle, infoWind, gooMarker, latLongs, len, box_0, t3, t4, t6, box_00, latlong, t5, vTitle, vDescription, vPhoto, vUserTime, t7;
     t1 = {};
     if (window.navigator.geolocation != null)
       $.getCurrentPosition$0$x(window.navigator.geolocation).then$2$onError(new $.loadMap__anon(), new $.loadMap__anon0());
@@ -283,107 +284,113 @@ $$.loadMap_anon = {"": "Closure;data_2,album_3",
       return this.call$0$bailout(1, t1, markerIcon, latLongs, makerShape, t2, markerIconShadow, divEle, infoWind, gooMarker);
     len = t2.length;
     box_0 = {};
-    for (box_0.i_0 = 0, t3 = this.album_3, t4 = len === 0; $.$lt$n(box_0.i_0, len) === true; box_00 = {}, box_00.i_0 = box_0.i_0, box_00.i_0 = $.$add$ns(box_00.i_0, 1), box_0 = box_00) {
-      if (t4)
+    box_0.i_0 = 0;
+    t3 = $.getInterceptor$asx(t2);
+    t4 = this.album_3;
+    if (typeof t4 !== "object" || t4 === null || t4.constructor !== Array || !!t4.fixed$length)
+      return this.call$0$bailout(3, t1, markerIcon, latLongs, makerShape, t2, markerIconShadow, divEle, infoWind, gooMarker, len, t4, $.JSInt_methods, box_0, t3);
+    t6 = len === 0;
+    for (; $.$lt$n(box_0.i_0, len) === true; box_00 = {}, box_00.i_0 = box_0.i_0, box_00.i_0 = $.$add$ns(box_00.i_0, 1), box_0 = box_00) {
+      if (t6)
         latlong = $.get$centre();
       else {
+        t3 = box_0.i_0;
+        if (t3 !== (t3 | 0))
+          throw $.iae(t3);
+        if (t3 < 0 || t3 >= t2.length)
+          throw $.ioore(t3);
+        t3 = $.$index$asx(t2[t3], "lat");
         t5 = box_0.i_0;
         if (t5 !== (t5 | 0))
           throw $.iae(t5);
         if (t5 < 0 || t5 >= t2.length)
           throw $.ioore(t5);
-        t5 = $.$index$asx(t2[t5], "lat");
-        t6 = box_0.i_0;
-        if (t6 !== (t6 | 0))
-          throw $.iae(t6);
-        if (t6 < 0 || t6 >= t2.length)
-          throw $.ioore(t6);
-        latlong = $.LatLng$(t5, $.$index$asx(t2[t6], "long"), null);
+        latlong = $.LatLng$(t3, $.$index$asx(t2[t5], "long"), null);
       }
       latLongs.push(latlong);
-      if (t4)
+      if (t6)
         vTitle = null;
       else {
-        t5 = box_0.i_0;
-        if (t5 !== (t5 | 0))
-          throw $.iae(t5);
-        if (t5 < 0 || t5 >= t2.length)
-          throw $.ioore(t5);
-        vTitle = $.$index$asx(t2[t5], "title");
+        t3 = box_0.i_0;
+        if (t3 !== (t3 | 0))
+          throw $.iae(t3);
+        if (t3 < 0 || t3 >= t2.length)
+          throw $.ioore(t3);
+        vTitle = $.$index$asx(t2[t3], "title");
       }
-      if (t4)
+      if (t6)
         vDescription = null;
       else {
-        t5 = box_0.i_0;
-        if (t5 !== (t5 | 0))
-          throw $.iae(t5);
-        if (t5 < 0 || t5 >= t2.length)
-          throw $.ioore(t5);
-        vDescription = $.$index$asx(t2[t5], "description");
+        t3 = box_0.i_0;
+        if (t3 !== (t3 | 0))
+          throw $.iae(t3);
+        if (t3 < 0 || t3 >= t2.length)
+          throw $.ioore(t3);
+        vDescription = $.$index$asx(t2[t3], "description");
       }
-      if (t4)
+      if (t6)
         vPhoto = null;
       else {
-        t5 = box_0.i_0;
-        if (t5 !== (t5 | 0))
-          throw $.iae(t5);
-        if (t5 < 0 || t5 >= t3.length)
-          throw $.ioore(t5);
-        vPhoto = t3[t5];
+        t3 = box_0.i_0;
+        if (t3 !== (t3 | 0))
+          throw $.iae(t3);
+        if (t3 < 0 || t3 >= t4.length)
+          throw $.ioore(t3);
+        vPhoto = t4[t3];
       }
-      if (t4)
+      if (t6)
         vUserTime = null;
       else {
-        t5 = box_0.i_0;
-        if (t5 !== (t5 | 0))
-          throw $.iae(t5);
-        if (t5 < 0 || t5 >= t2.length)
-          throw $.ioore(t5);
-        vUserTime = $.$index$asx(t2[t5], "time");
+        t3 = box_0.i_0;
+        if (t3 !== (t3 | 0))
+          throw $.iae(t3);
+        if (t3 < 0 || t3 >= t2.length)
+          throw $.ioore(t3);
+        vUserTime = $.$index$asx(t2[t3], "time");
       }
       $.infoContent(vTitle, vUserTime, vDescription, vPhoto, divEle);
-      t5 = $.InfoWindowOptions$();
-      t6 = box_0.i_0;
-      if (t6 !== (t6 | 0))
-        throw $.iae(t6);
-      if (t6 < 0 || t6 >= divEle.length)
-        throw $.ioore(t6);
-      t5.set$content(t5, divEle[t6]);
-      t5.set$maxWidth(t5, 275);
-      infoWind.push($.InfoWindow$(t5));
-      t5 = $.MarkerOptions$();
-      t6 = box_0.i_0;
-      if (t6 !== (t6 | 0))
-        throw $.iae(t6);
-      if (t6 < 0 || t6 >= latLongs.length)
-        throw $.ioore(t6);
-      t5.set$position(t5, latLongs[t6]);
-      t5.set$map(t5, $.map);
-      t5.set$draggable(t5, false);
-      t5.set$shape(t5, makerShape);
-      t5.set$animation(t5, $.get$Animation_DROP());
-      t5.set$icon(markerIcon);
-      t5.set$shadow(markerIconShadow);
-      gooMarker.push($.Marker$(t5));
+      t3 = $.InfoWindowOptions$();
+      t5 = box_0.i_0;
+      if (t5 !== (t5 | 0))
+        throw $.iae(t5);
+      if (t5 < 0 || t5 >= divEle.length)
+        throw $.ioore(t5);
+      t3.set$content(t3, divEle[t5]);
+      t3.set$maxWidth(t3, 275);
+      infoWind.push($.InfoWindow$(t3));
+      t3 = $.MarkerOptions$();
+      t5 = box_0.i_0;
+      if (t5 !== (t5 | 0))
+        throw $.iae(t5);
+      if (t5 < 0 || t5 >= latLongs.length)
+        throw $.ioore(t5);
+      t3.set$position(t3, latLongs[t5]);
+      t3.set$map(t3, $.map);
+      t3.set$draggable(t3, false);
+      t3.set$shape(t3, makerShape);
+      t3.set$animation(t3, $.get$Animation_DROP());
+      t3.set$icon(markerIcon);
+      t3.set$shadow(markerIconShadow);
+      gooMarker.push($.Marker$(t3));
+      t3 = box_0.i_0;
+      if (t3 !== (t3 | 0))
+        throw $.iae(t3);
+      if (t3 < 0 || t3 >= gooMarker.length)
+        throw $.ioore(t3);
+      $.add$1$ax($.get$click$x($.get$on$x(gooMarker[t3])), new $.loadMap__anon2(box_0, t1, infoWind, gooMarker));
+      t3 = $.map;
       t5 = box_0.i_0;
       if (t5 !== (t5 | 0))
         throw $.iae(t5);
       if (t5 < 0 || t5 >= gooMarker.length)
         throw $.ioore(t5);
-      $.add$1$ax($.get$click$x($.get$on$x(gooMarker[t5])), new $.loadMap__anon2(box_0, t1, infoWind, gooMarker));
-      t5 = $.map;
-      t6 = box_0.i_0;
-      if (t6 !== (t6 | 0))
-        throw $.iae(t6);
-      if (t6 < 0 || t6 >= gooMarker.length)
-        throw $.ioore(t6);
-      t7 = gooMarker[t6];
-      if (t6 >= infoWind.length)
-        throw $.ioore(t6);
-      $.JSArray_methods.forEach$1([t5, t7, makerShape, infoWind[t6]], $.retain);
+      t7 = gooMarker[t5];
+      if (t5 >= infoWind.length)
+        throw $.ioore(t5);
+      $.JSArray_methods.forEach$1([t3, t7, makerShape, infoWind[t5]], $.retain);
     }
   },
-  call$0$bailout: function(state0, t1, markerIcon, latLongs, makerShape, t2, markerIconShadow, divEle, infoWind, gooMarker, len) {
+  call$0$bailout: function(state0, t1, markerIcon, latLongs, makerShape, t2, markerIconShadow, divEle, infoWind, gooMarker, len, t5, t3, box_0, t4) {
     switch (state0) {
       case 0:
         t1 = {};
@@ -423,40 +430,38 @@ $$.loadMap_anon = {"": "Closure;data_2,album_3",
         state0 = 0;
         len = $.get$length$asx(t2);
       case 2:
-        var latlng, request, mapOptions, box_0, t3, t4, t5, box_00, vTitle, vDescription, vPhoto, t6, t7, t8;
         state0 = 0;
         box_0 = {};
-        for (box_0.i_0 = 0, t3 = $.getInterceptor(len), t4 = $.getInterceptor$asx(t2), t5 = this.album_3; $.$lt$n(box_0.i_0, len) === true; box_00 = {}, box_00.i_0 = box_0.i_0, box_00.i_0 = $.$add$ns(box_00.i_0, 1), box_0 = box_00) {
+        box_0.i_0 = 0;
+        t3 = $.getInterceptor(len);
+        t4 = $.getInterceptor$asx(t2);
+        t5 = this.album_3;
+      case 3:
+        var latlng, request, mapOptions, t7, box_00, vTitle, vDescription, vPhoto, t6, t8, t9;
+        state0 = 0;
+        t7 = $.getInterceptor$asx(t5);
+        for (; $.$lt$n(box_0.i_0, len) === true; box_00 = {}, box_00.i_0 = box_0.i_0, box_00.i_0 = $.$add$ns(box_00.i_0, 1), box_0 = box_00) {
           latLongs.push(t3.$eq(len, 0) === true ? $.get$centre() : $.LatLng$($.$index$asx(t4.$index(t2, box_0.i_0), "lat"), $.$index$asx(t4.$index(t2, box_0.i_0), "long"), null));
           vTitle = t3.$eq(len, 0) === true ? null : $.$index$asx(t4.$index(t2, box_0.i_0), "title");
           vDescription = t3.$eq(len, 0) === true ? null : $.$index$asx(t4.$index(t2, box_0.i_0), "description");
-          if (t3.$eq(len, 0) === true)
-            vPhoto = null;
-          else {
-            t6 = box_0.i_0;
-            if (t6 !== (t6 | 0))
-              throw $.iae(t6);
-            if (t6 < 0 || t6 >= t5.length)
-              throw $.ioore(t6);
-            vPhoto = t5[t6];
-          }
+          vPhoto = t3.$eq(len, 0) === true ? null : t7.$index(t5, box_0.i_0);
           $.infoContent(vTitle, t3.$eq(len, 0) === true ? null : $.$index$asx(t4.$index(t2, box_0.i_0), "time"), vDescription, vPhoto, divEle);
           t6 = $.InfoWindowOptions$();
-          t7 = box_0.i_0;
-          if (t7 !== (t7 | 0))
-            throw $.iae(t7);
-          if (t7 < 0 || t7 >= divEle.length)
-            throw $.ioore(t7);
-          t6.set$content(t6, divEle[t7]);
+          t8 = box_0.i_0;
+          if (t8 !== (t8 | 0))
+            throw $.iae(t8);
+          if (t8 < 0 || t8 >= divEle.length)
+            throw $.ioore(t8);
+          t6.set$content(t6, divEle[t8]);
           t6.set$maxWidth(t6, 275);
           infoWind.push($.InfoWindow$(t6));
           t6 = $.MarkerOptions$();
-          t7 = box_0.i_0;
-          if (t7 !== (t7 | 0))
-            throw $.iae(t7);
-          if (t7 < 0 || t7 >= latLongs.length)
-            throw $.ioore(t7);
-          t6.set$position(t6, latLongs[t7]);
+          t8 = box_0.i_0;
+          if (t8 !== (t8 | 0))
+            throw $.iae(t8);
+          if (t8 < 0 || t8 >= latLongs.length)
+            throw $.ioore(t8);
+          t6.set$position(t6, latLongs[t8]);
           t6.set$map(t6, $.map);
           t6.set$draggable(t6, false);
           t6.set$shape(t6, makerShape);
@@ -471,15 +476,15 @@ $$.loadMap_anon = {"": "Closure;data_2,album_3",
             throw $.ioore(t6);
           $.add$1$ax($.get$click$x($.get$on$x(gooMarker[t6])), new $.loadMap__anon2(box_0, t1, infoWind, gooMarker));
           t6 = $.map;
-          t7 = box_0.i_0;
-          if (t7 !== (t7 | 0))
-            throw $.iae(t7);
-          if (t7 < 0 || t7 >= gooMarker.length)
-            throw $.ioore(t7);
-          t8 = gooMarker[t7];
-          if (t7 >= infoWind.length)
-            throw $.ioore(t7);
-          $.JSArray_methods.forEach$1([t6, t8, makerShape, infoWind[t7]], $.retain);
+          t8 = box_0.i_0;
+          if (t8 !== (t8 | 0))
+            throw $.iae(t8);
+          if (t8 < 0 || t8 >= gooMarker.length)
+            throw $.ioore(t8);
+          t9 = gooMarker[t8];
+          if (t8 >= infoWind.length)
+            throw $.ioore(t8);
+          $.JSArray_methods.forEach$1([t6, t9, makerShape, infoWind[t8]], $.retain);
         }
     }
   }
@@ -4997,6 +5002,9 @@ $$.Duration = {"": "Object;_duration<",
   $gt: function(_, other) {
     return this._duration > other.get$_duration();
   },
+  $le: function(_, other) {
+    return this._duration <= other.get$_duration();
+  },
   $ge: function(_, other) {
     return this._duration >= other.get$_duration();
   },
@@ -5326,6 +5334,9 @@ $$.Object = {"": ";",
   $indexSet: function($receiver, $0, $1) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("[]=", "$indexSet", 0, [$0, $1], []));
   },
+  $le: function($receiver, $0) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("<=", "$le", 0, [$0], []));
+  },
   $lt: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("<", "$lt", 0, [$0], []));
   },
@@ -5383,6 +5394,9 @@ $$.Object = {"": ";",
   codeUnitAt$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("codeUnitAt", "codeUnitAt$1", 0, [$0], []));
   },
+  createTHead$0: function($receiver) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("createTHead", "createTHead$0", 0, [], []));
+  },
   endsWith$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("endsWith", "endsWith$1", 0, [$0], []));
   },
@@ -5427,6 +5441,9 @@ $$.Object = {"": ";",
   },
   get$event: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("event", "get$event", 1, [], []));
+  },
+  get$files: function($receiver) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("files", "get$files", 1, [], []));
   },
   get$id: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("id", "get$id", 1, [], []));
@@ -5482,6 +5499,9 @@ $$.Object = {"": ";",
   get$src: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("src", "get$src", 1, [], []));
   },
+  get$tHead: function($receiver) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("tHead", "get$tHead", 1, [], []));
+  },
   get$target: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("target", "get$target", 1, [], []));
   },
@@ -5499,6 +5519,12 @@ $$.Object = {"": ";",
   },
   indexOf$2: function($receiver, $0, $1) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("indexOf", "indexOf$2", 0, [$0, $1], []));
+  },
+  insertCell$1: function($receiver, $0) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("insertCell", "insertCell$1", 0, [$0], []));
+  },
+  insertRow$1: function($receiver, $0) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("insertRow", "insertRow$1", 0, [$0], []));
   },
   map$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("map", "map$1", 0, [$0], []));
@@ -5914,10 +5940,10 @@ $$._FrozenElementList = {"": "Object;_nodeList",
   }
 };
 
-$$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
+$$._FrozenElementListIterator = {"": "Object;_list,_liblib2$_index,_current",
   moveNext$0: function() {
     var t1, nextIndex, t2;
-    t1 = this._liblib4$_index;
+    t1 = this._liblib2$_index;
     if (typeof t1 !== "number")
       return this.moveNext$0$bailout(1, t1);
     nextIndex = t1 + 1;
@@ -5927,17 +5953,17 @@ $$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
       return this.moveNext$0$bailout(2, t1, t2, nextIndex);
     if (nextIndex < t2) {
       this._current = t1.$index(t1, nextIndex);
-      this._liblib4$_index = nextIndex;
+      this._liblib2$_index = nextIndex;
       return true;
     }
-    this._liblib4$_index = t1.get$length(t1);
+    this._liblib2$_index = t1.get$length(t1);
     this._current = null;
     return false;
   },
   moveNext$0$bailout: function(state0, t1, t2, nextIndex) {
     switch (state0) {
       case 0:
-        t1 = this._liblib4$_index;
+        t1 = this._liblib2$_index;
       case 1:
         state0 = 0;
         nextIndex = $.$add$ns(t1, 1);
@@ -5947,10 +5973,10 @@ $$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
         state0 = 0;
         if ($.$lt$n(nextIndex, t2)) {
           this._current = t1.$index(t1, nextIndex);
-          this._liblib4$_index = nextIndex;
+          this._liblib2$_index = nextIndex;
           return true;
         }
-        this._liblib4$_index = t1.get$length(t1);
+        this._liblib2$_index = t1.get$length(t1);
         this._current = null;
         return false;
     }
@@ -6448,17 +6474,17 @@ $$.Rect = {"": "Object;left>,top>,width>,height>",
   }
 };
 
-$$._JsSerializer0 = {"": "_Serializer0;_liblib4$_nextFreeRefId,_liblib4$_visited",
+$$._JsSerializer0 = {"": "_Serializer0;_liblib2$_nextFreeRefId,_liblib2$_visited",
   visitSendPortSync$1: function(x) {
     if (!!$.getInterceptor(x).$is_JsSendPortSync)
-      return ["sendport", "nativejs", x._liblib4$_id];
+      return ["sendport", "nativejs", x._liblib2$_id];
     if (!!$.getInterceptor(x).$is_LocalSendPortSync) {
       if ($.ReceivePortSync__cachedIsolateId == null)
         $.ReceivePortSync__cachedIsolateId = $._getNewIsolateId();
-      return ["sendport", "dart", $.ReceivePortSync__cachedIsolateId, x._liblib4$_receivePort._portId];
+      return ["sendport", "dart", $.ReceivePortSync__cachedIsolateId, x._liblib2$_receivePort._portId];
     }
     if (!!$.getInterceptor(x).$is_RemoteSendPortSync)
-      return ["sendport", "dart", x._liblib4$_isolateId, x._portId];
+      return ["sendport", "dart", x._liblib2$_isolateId, x._portId];
     throw $.$$throw("Unknown port type " + $.S(x));
   },
   visitSendPort$1: function(x) {
@@ -6466,7 +6492,7 @@ $$._JsSerializer0 = {"": "_Serializer0;_liblib4$_nextFreeRefId,_liblib4$_visited
   }
 };
 
-$$._JsDeserializer0 = {"": "_Deserializer0;_liblib4$_deserialized",
+$$._JsDeserializer0 = {"": "_Deserializer0;_liblib2$_deserialized",
   deserializeSendPort$1: function(x) {
     var t1, tag;
     t1 = $.getInterceptor$asx(x);
@@ -6482,28 +6508,28 @@ $$._JsDeserializer0 = {"": "_Deserializer0;_liblib4$_deserialized",
   }
 };
 
-$$._JsSendPortSync = {"": "Object;_liblib4$_id",
+$$._JsSendPortSync = {"": "Object;_liblib2$_id",
   callSync$1: function(message) {
-    var result = ReceivePortSync.dispatchCall(this._liblib4$_id, $._JsSerializer$0().traverse$1(message));
+    var result = ReceivePortSync.dispatchCall(this._liblib2$_id, $._JsSerializer$0().traverse$1(message));
     return $._JsDeserializer$0().deserialize$1(result);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
-    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_JsSendPortSync && $.$eq(this._liblib4$_id, other._liblib4$_id) === true;
+    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_JsSendPortSync && $.$eq(this._liblib2$_id, other._liblib2$_id) === true;
   },
   get$hashCode: function(_) {
-    return this._liblib4$_id;
+    return this._liblib2$_id;
   },
   $is_JsSendPortSync: true,
   $isSendPortSync: true
 };
 
-$$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
+$$._RemoteSendPortSync = {"": "Object;_liblib2$_isolateId,_portId",
   callSync$1: function(message) {
     var serialized, result;
     serialized = $._JsSerializer$0().traverse$1(message);
-    result = $._RemoteSendPortSync__call(this._liblib4$_isolateId, this._portId, serialized);
+    result = $._RemoteSendPortSync__call(this._liblib2$_isolateId, this._portId, serialized);
     return $._JsDeserializer$0().deserialize$1(result);
   },
   $eq: function(_, other) {
@@ -6511,7 +6537,7 @@ $$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
     if (other == null)
       return false;
     if (typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_RemoteSendPortSync)
-      t1 = $.$eq(this._liblib4$_isolateId, other._liblib4$_isolateId) === true && $.$eq(this._portId, other._portId) === true;
+      t1 = $.$eq(this._liblib2$_isolateId, other._liblib2$_isolateId) === true && $.$eq(this._portId, other._portId) === true;
     else
       t1 = false;
     return t1;
@@ -6520,7 +6546,7 @@ $$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
     var t1 = this._portId;
     if (typeof t1 !== "number")
       throw $.iae(t1);
-    return $.$shr$n(this._liblib4$_isolateId, 16 + t1);
+    return $.$shr$n(this._liblib2$_isolateId, 16 + t1);
   },
   $is_RemoteSendPortSync: true,
   $isSendPortSync: true
@@ -6533,37 +6559,37 @@ $$._RemoteSendPortSync__call_anon = {"": "Closure;box_0",
   }
 };
 
-$$._LocalSendPortSync = {"": "Object;_liblib4$_receivePort",
+$$._LocalSendPortSync = {"": "Object;_liblib2$_receivePort",
   callSync$1: function(message) {
     var t1, result;
     t1 = $._JsSerializer$0().traverse$1(message);
-    result = this._liblib4$_receivePort._liblib4$_callback$1($._JsDeserializer$0().deserialize$1(t1));
+    result = this._liblib2$_receivePort._liblib2$_callback$1($._JsDeserializer$0().deserialize$1(t1));
     t1 = $._JsSerializer$0().traverse$1(result);
     return $._JsDeserializer$0().deserialize$1(t1);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
-    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_LocalSendPortSync && this._liblib4$_receivePort === other._liblib4$_receivePort;
+    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_LocalSendPortSync && this._liblib2$_receivePort === other._liblib2$_receivePort;
   },
   get$hashCode: function(_) {
-    var t1 = this._liblib4$_receivePort;
+    var t1 = this._liblib2$_receivePort;
     return t1.get$hashCode(t1);
   },
   $is_LocalSendPortSync: true,
   $isSendPortSync: true
 };
 
-$$.ReceivePortSync = {"": "Object;_portId,_liblib4$_callback,_portSubscription",
-  _liblib4$_callback$1: function(arg0) {
-    return this._liblib4$_callback.call$1(arg0);
+$$.ReceivePortSync = {"": "Object;_portId,_liblib2$_callback,_portSubscription",
+  _liblib2$_callback$1: function(arg0) {
+    return this._liblib2$_callback.call$1(arg0);
   },
   get$_listenerName: function() {
     return $.ReceivePortSync__getListenerName($.ReceivePortSync__isolateId(), this._portId);
   },
   receive$1: function(callback) {
     var t1;
-    this._liblib4$_callback = callback;
+    this._liblib2$_callback = callback;
     if (this._portSubscription == null) {
       t1 = $.get$on$x(window);
       this._portSubscription = t1.$index(t1, this.get$_listenerName()).listen$1(new $.ReceivePortSync_receive_anon(this));
@@ -6599,7 +6625,7 @@ $$.ReceivePortSync_receive_anon = {"": "Closure;this_0",
     replyTo = t1.$index(data, 0);
     t1 = t1.$index(data, 1);
     message = $._JsDeserializer$0().deserialize$1(t1);
-    result = this.this_0._liblib4$_callback$1(message);
+    result = this.this_0._liblib2$_callback$1(message);
     t1 = $._JsSerializer$0().traverse$1(result);
     output = $.StringBuffer$("");
     $._JsonStringifier$(output).stringifyValue$1(t1);
@@ -6628,17 +6654,17 @@ $$._MessageTraverser0 = {"": "Object;",
     t1 = x;
     if (t1 == null || typeof t1 === "string" || typeof t1 === "number" || typeof t1 === "boolean")
       return this.visitPrimitive$1(x);
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib2$_visited;
     t1.reset$0(t1);
     result = null;
     try {
-      result = this._liblib4$_dispatch$1(x);
+      result = this._liblib2$_dispatch$1(x);
     } finally {
       t1.cleanup$0();
     }
     return result;
   },
-  _liblib4$_dispatch$1: function(x) {
+  _liblib2$_dispatch$1: function(x) {
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
       return this.visitPrimitive$1(x);
     if (typeof x === "object" && x !== null && (x.constructor === Array || $.getInterceptor(x).$isList()))
@@ -6662,41 +6688,41 @@ $$._Serializer0 = {"": "_MessageTraverser0;",
   },
   visitList$1: function(list) {
     var t1, copyId, id;
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib2$_visited;
     copyId = t1.$index(t1, list);
     if (copyId != null)
       return ["ref", copyId];
-    id = this._liblib4$_nextFreeRefId;
-    this._liblib4$_nextFreeRefId = id + 1;
+    id = this._liblib2$_nextFreeRefId;
+    this._liblib2$_nextFreeRefId = id + 1;
     t1.$indexSet(t1, list, id);
-    return ["list", id, this._liblib4$_serializeList$1(list)];
+    return ["list", id, this._liblib2$_serializeList$1(list)];
   },
   visitMap$1: function(map) {
     var t1, copyId, id;
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib2$_visited;
     copyId = t1.$index(t1, map);
     if (copyId != null)
       return ["ref", copyId];
-    id = this._liblib4$_nextFreeRefId;
-    this._liblib4$_nextFreeRefId = id + 1;
+    id = this._liblib2$_nextFreeRefId;
+    this._liblib2$_nextFreeRefId = id + 1;
     t1.$indexSet(t1, map, id);
     t1 = $.getInterceptor$x(map);
-    return ["map", id, this._liblib4$_serializeList$1($.toList$0$ax(t1.get$keys(map))), this._liblib4$_serializeList$1($.toList$0$ax(t1.get$values(map)))];
+    return ["map", id, this._liblib2$_serializeList$1($.toList$0$ax(t1.get$keys(map))), this._liblib2$_serializeList$1($.toList$0$ax(t1.get$values(map)))];
   },
-  _liblib4$_serializeList$1: function(list) {
+  _liblib2$_serializeList$1: function(list) {
     var len, result, i;
     if (typeof list !== "string" && (typeof list !== "object" || list === null || list.constructor !== Array && !$.getInterceptor(list).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_serializeList$1$bailout(1, list);
+      return this._liblib2$_serializeList$1$bailout(1, list);
     len = list.length;
     result = $.List_List(len);
     for (i = 0; i < len; ++i) {
       if (i >= list.length)
         throw $.ioore(i);
-      result[i] = this._liblib4$_dispatch$1(list[i]);
+      result[i] = this._liblib2$_dispatch$1(list[i]);
     }
     return result;
   },
-  _liblib4$_serializeList$1$bailout: function(state0, list, t1, len) {
+  _liblib2$_serializeList$1$bailout: function(state0, list, t1, len) {
     switch (state0) {
       case 0:
       case 1:
@@ -6708,7 +6734,7 @@ $$._Serializer0 = {"": "_MessageTraverser0;",
         state0 = 0;
         result = $.List_List(len);
         for (t2 = result.length, i = 0; $.JSNumber_methods.$lt(i, len); ++i) {
-          t3 = this._liblib4$_dispatch$1(t1.$index(list, i));
+          t3 = this._liblib2$_dispatch$1(t1.$index(list, i));
           if (i >= t2)
             throw $.ioore(i);
           result[i] = t3;
@@ -6722,10 +6748,10 @@ $$._Deserializer0 = {"": "Object;",
   deserialize$1: function(x) {
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
       return x;
-    this._liblib4$_deserialized = $.HashMap$();
-    return this._liblib4$_deserializeHelper$1(x);
+    this._liblib2$_deserialized = $.HashMap$();
+    return this._liblib2$_deserializeHelper$1(x);
   },
-  _liblib4$_deserializeHelper$1: function(x) {
+  _liblib2$_deserializeHelper$1: function(x) {
     var t1, id;
     t1 = $.getInterceptor(x);
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
@@ -6733,79 +6759,79 @@ $$._Deserializer0 = {"": "Object;",
     switch (t1.$index(x, 0)) {
       case "ref":
         id = t1.$index(x, 1);
-        t1 = this._liblib4$_deserialized;
+        t1 = this._liblib2$_deserialized;
         return t1.$index(t1, id);
       case "list":
-        return this._liblib4$_deserializeList$1(x);
+        return this._liblib2$_deserializeList$1(x);
       case "map":
-        return this._liblib4$_deserializeMap$1(x);
+        return this._liblib2$_deserializeMap$1(x);
       case "sendport":
         return this.deserializeSendPort$1(x);
       default:
         return this.deserializeObject$1(x);
     }
   },
-  _liblib4$_deserializeList$1: function(x) {
+  _liblib2$_deserializeList$1: function(x) {
     var t1, id, dartList, t2, len, i;
     t1 = $.getInterceptor$asx(x);
     id = t1.$index(x, 1);
     dartList = t1.$index(x, 2);
     if (typeof dartList !== "object" || dartList === null || (dartList.constructor !== Array || !!dartList.immutable$list) && !$.getInterceptor(dartList).$isJavaScriptIndexingBehavior())
-      return this._liblib4$_deserializeList$1$bailout(1, dartList, id);
-    t2 = this._liblib4$_deserialized;
+      return this._liblib2$_deserializeList$1$bailout(1, dartList, id);
+    t2 = this._liblib2$_deserialized;
     t2.$indexSet(t2, id, dartList);
     len = dartList.length;
     for (i = 0; i < len; ++i) {
       if (i >= dartList.length)
         throw $.ioore(i);
-      t1 = this._liblib4$_deserializeHelper$1(dartList[i]);
+      t1 = this._liblib2$_deserializeHelper$1(dartList[i]);
       if (i >= dartList.length)
         throw $.ioore(i);
       dartList[i] = t1;
     }
     return dartList;
   },
-  _liblib4$_deserializeList$1$bailout: function(state0, dartList, id) {
+  _liblib2$_deserializeList$1$bailout: function(state0, dartList, id) {
     var t2, len, i;
-    t2 = this._liblib4$_deserialized;
+    t2 = this._liblib2$_deserialized;
     t2.$indexSet(t2, id, dartList);
     t2 = $.getInterceptor$asx(dartList);
     len = t2.get$length(dartList);
     for (i = 0; $.JSNumber_methods.$lt(i, len); ++i)
-      t2.$indexSet(dartList, i, this._liblib4$_deserializeHelper$1(t2.$index(dartList, i)));
+      t2.$indexSet(dartList, i, this._liblib2$_deserializeHelper$1(t2.$index(dartList, i)));
     return dartList;
   },
-  _liblib4$_deserializeMap$1: function(x) {
+  _liblib2$_deserializeMap$1: function(x) {
     var result, t1, id, t2, keys, values, len, i, key;
     result = $.HashMap$();
     t1 = $.getInterceptor$asx(x);
     id = t1.$index(x, 1);
-    t2 = this._liblib4$_deserialized;
+    t2 = this._liblib2$_deserialized;
     t2.$indexSet(t2, id, result);
     keys = t1.$index(x, 2);
     if (typeof keys !== "string" && (typeof keys !== "object" || keys === null || keys.constructor !== Array && !$.getInterceptor(keys).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_deserializeMap$1$bailout(1, x, result, keys, t1);
+      return this._liblib2$_deserializeMap$1$bailout(1, x, result, keys, t1);
     values = t1.$index(x, 3);
     if (typeof values !== "string" && (typeof values !== "object" || values === null || values.constructor !== Array && !$.getInterceptor(values).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_deserializeMap$1$bailout(2, 0, result, keys, 0, values);
+      return this._liblib2$_deserializeMap$1$bailout(2, 0, result, keys, 0, values);
     len = keys.length;
     for (i = 0; i < len; ++i) {
       if (i >= keys.length)
         throw $.ioore(i);
-      key = this._liblib4$_deserializeHelper$1(keys[i]);
+      key = this._liblib2$_deserializeHelper$1(keys[i]);
       if (i >= values.length)
         throw $.ioore(i);
-      result.$indexSet(result, key, this._liblib4$_deserializeHelper$1(values[i]));
+      result.$indexSet(result, key, this._liblib2$_deserializeHelper$1(values[i]));
     }
     return result;
   },
-  _liblib4$_deserializeMap$1$bailout: function(state0, x, result, keys, t1, values, t3, len) {
+  _liblib2$_deserializeMap$1$bailout: function(state0, x, result, keys, t1, values, t3, len) {
     switch (state0) {
       case 0:
         result = $.HashMap$();
         t1 = $.getInterceptor$asx(x);
         id = t1.$index(x, 1);
-        t2 = this._liblib4$_deserialized;
+        t2 = this._liblib2$_deserialized;
         t2.$indexSet(t2, id, result);
         keys = t1.$index(x, 2);
       case 1:
@@ -6819,7 +6845,7 @@ $$._Deserializer0 = {"": "Object;",
         var id, t2, i;
         state0 = 0;
         for (t1 = $.getInterceptor$asx(values), i = 0; $.JSNumber_methods.$lt(i, len); ++i)
-          result.$indexSet(result, this._liblib4$_deserializeHelper$1(t3.$index(keys, i)), this._liblib4$_deserializeHelper$1(t1.$index(values, i)));
+          result.$indexSet(result, this._liblib2$_deserializeHelper$1(t3.$index(keys, i)), this._liblib2$_deserializeHelper$1(t1.$index(values, i)));
         return result;
     }
   },
@@ -7653,10 +7679,10 @@ $$._JsonStringifier_stringifyJsonValue_anon = {"": "Closure;box_0,this_1",
   }
 };
 
-$$._AttributeClassSet = {"": "CssClassSet;_liblib2$_element",
+$$._AttributeClassSet = {"": "CssClassSet;_liblib5$_element",
   readClasses$0: function() {
     var t1, classname, s, trimmed;
-    t1 = $.get$attributes$x(this._liblib2$_element);
+    t1 = $.get$attributes$x(this._liblib5$_element);
     classname = t1.$index(t1, "class");
     s = $.LinkedHashSet$();
     if (classname == null)
@@ -7669,7 +7695,7 @@ $$._AttributeClassSet = {"": "CssClassSet;_liblib2$_element",
     return s;
   },
   writeClasses$1: function(s) {
-    var t1 = $.get$attributes$x(this._liblib2$_element);
+    var t1 = $.get$attributes$x(this._liblib5$_element);
     t1.$indexSet(t1, "class", s.join$1(s, " "));
   }
 };
@@ -7945,13 +7971,13 @@ $$.None = {"": "Option;",
   }
 };
 
-$$.Some = {"": "Option;_liblib5$_value",
+$$.Some = {"": "Option;_liblib4$_value",
   map$1: function(_, transform) {
-    var t1 = transform.call$1(this._liblib5$_value);
+    var t1 = transform.call$1(this._liblib4$_value);
     return t1 == null ? $.get$NONE() : $.Some$_(t1);
   },
   get$value: function(_) {
-    return this._liblib5$_value;
+    return this._liblib4$_value;
   }
 };
 
@@ -8829,7 +8855,7 @@ $$.DListElement = {"": "Element;"};
 
 $$.DataListElement = {"": "Element;"};
 
-$$.DataTransfer = {"": "Interceptor;"};
+$$.DataTransfer = {"": "Interceptor;files="};
 
 $$.DataTransferItem = {"": "Interceptor;"};
 
@@ -9292,12 +9318,12 @@ $$.EmbedElement = {"": "Element;height},src%,type},width}"};
 $$.EntityReference = {"": "Node;"};
 
 $$.Entry = {"": "Interceptor;",
-  _liblib4$_remove$2: function(receiver, successCallback, errorCallback) {
+  _liblib2$_remove$2: function(receiver, successCallback, errorCallback) {
     return receiver.remove($.convertDartClosureToJS(successCallback, 0),$.convertDartClosureToJS(errorCallback, 1));
   },
   remove$0: function(receiver) {
     var completer = $._CompleterImpl$();
-    this._liblib4$_remove$2(receiver, new $.Entry_remove_anon(completer), new $.Entry_remove_anon0(completer));
+    this._liblib2$_remove$2(receiver, new $.Entry_remove_anon(completer), new $.Entry_remove_anon0(completer));
     return completer.future;
   }
 };
@@ -10982,11 +11008,38 @@ $$.TableCellElement = {"": "Element;"};
 
 $$.TableColElement = {"": "Element;"};
 
-$$.TableElement = {"": "Element;"};
+$$.TableElement = {"": "Element;tHead=",
+  createTBody$0: function(receiver) {
+    return this.$$dom_createTBody$0(receiver);
+  },
+  createTHead$0: function(receiver) {
+    return receiver.createTHead();
+  },
+  insertRow$1: function(receiver, index) {
+    return receiver.insertRow(index);
+  },
+  $$dom_createTBody$0: function(receiver) {
+    var tbody, t1;
+    if (!!receiver.createTBody)
+      return receiver.createTBody();
+    tbody = document.createElement("tbody");
+    t1 = this.get$children(receiver);
+    t1.add$1(t1, tbody);
+    return tbody;
+  }
+};
 
-$$.TableRowElement = {"": "Element;"};
+$$.TableRowElement = {"": "Element;",
+  insertCell$1: function(receiver, index) {
+    return receiver.insertCell(index);
+  }
+};
 
-$$.TableSectionElement = {"": "Element;"};
+$$.TableSectionElement = {"": "Element;",
+  insertRow$1: function(receiver, index) {
+    return receiver.insertRow(index);
+  }
+};
 
 $$.TemplateElement = {"": "Element;"};
 
@@ -14022,23 +14075,118 @@ Isolate.$finishClasses($$, $, null);
 $$ = null;
 
 $.main = function() {
-  var uploadInput, e, t1, uploadInput0, exception;
   $.HttpRequest_getString("/receive", null, null).then$1($.processString);
-  $.HttpRequest_getString("/pngReceive", null, null).then$1($.processPNG);
-  $.get$onKeyPress$x(document.querySelector("#title")).listen$1(new $.main_anon());
-  $.get$onKeyPress$x(document.querySelector("#description")).listen$1(new $.main_anon0());
+  $.HttpRequest_getString("/pngreceive", null, null).then$1($.processPNG);
+  $.Primitives_printString("get information now:");
+  $.HttpRequest_getString("/receiveinfo", null, null).then$1($.processInfo);
+  $.get$onClick$x(document.querySelector("#next")).listen$1(new $.main_anon());
+  $.get$onClick$x(document.querySelector("#pre")).listen$1(new $.main_anon0());
+  $.get$onKeyPress$x(document.querySelector("#title")).listen$1(new $.main_anon1());
+  $.get$onKeyPress$x(document.querySelector("#description")).listen$1(new $.main_anon2());
+  $.get$onChange$x(document.querySelector("#photo")).listen$1(new $.main_anon3());
+  $.get$onClick$x(document.querySelector("#submit")).listen$1(new $.main_anon4());
+};
+
+$.resetTable = function() {
+  var table, headerRow, e, t1, table0, exception;
   try {
     t1 = document;
-    uploadInput0 = t1.querySelector("#photo");
-    uploadInput = uploadInput0;
-    $.getIMAGE(uploadInput);
+    table0 = t1.createElement("table");
+    table = table0;
+    $.set$id$x(table, "tb_news");
+    $.createTHead$0$x(table);
+    headerRow = $.insertRow$1$x($.get$tHead$x(table), -1);
+    $.insertCell$1$x(headerRow, 0).textContent = "Photo";
+    $.insertCell$1$x(headerRow, 1).textContent = "Title";
+    $.insertCell$1$x(headerRow, 2).textContent = "Time";
+    $.insertCell$1$x(headerRow, 3).textContent = "Description";
+    t1 = document;
+    t1 = t1.querySelector("#tb_news");
+    $.replaceWith$1$x(t1, table);
+    return true;
   } catch (exception) {
     t1 = $.unwrapException(exception);
     e = t1;
-    $.Primitives_printString("upload error: " + $.S(e));
+    $.Primitives_printString($.toString$0(e));
+    return false;
   }
 
-  $.get$onClick$x(document.querySelector("#submit")).listen$1(new $.main_anon1());
+};
+
+$.createTable = function(mapData) {
+  var tBody, len, t1, t2, i, $$id, t3, t4, t5;
+  if (typeof mapData !== "string" && (typeof mapData !== "object" || mapData === null || mapData.constructor !== Array && !$.getInterceptor(mapData).$isJavaScriptIndexingBehavior()))
+    return $.createTable$bailout(1, mapData);
+  tBody = $.createTBody$0$x(document.querySelector("#tb_news"));
+  len = mapData.length;
+  for (t1 = $.getInterceptor$x(tBody), t2 = len === 0, i = 0; i < len; ++i) {
+    "" + i;
+    $$id = t1.insertRow$1(tBody, -1);
+    t3 = $.getInterceptor$x($$id);
+    t4 = t3.insertCell$1($$id, 0);
+    if (t2)
+      t5 = null;
+    else {
+      if (i >= mapData.length)
+        throw $.ioore(i);
+      t5 = $.$index$asx(mapData[i], "photo");
+    }
+    t4.textContent = t5;
+    t5 = t3.insertCell$1($$id, 1);
+    if (t2)
+      t4 = null;
+    else {
+      if (i >= mapData.length)
+        throw $.ioore(i);
+      t4 = $.$index$asx(mapData[i], "title");
+    }
+    t5.textContent = t4;
+    t4 = t3.insertCell$1($$id, 2);
+    if (t2)
+      t5 = null;
+    else {
+      if (i >= mapData.length)
+        throw $.ioore(i);
+      t5 = $.$index$asx(mapData[i], "time");
+    }
+    t4.textContent = t5;
+    t3 = t3.insertCell$1($$id, 3);
+    if (t2)
+      t4 = null;
+    else {
+      if (i >= mapData.length)
+        throw $.ioore(i);
+      t4 = $.$index$asx(mapData[i], "description");
+    }
+    t3.textContent = t4;
+  }
+};
+
+$.createTable$bailout = function(state0, mapData, t1, len, tBody) {
+  switch (state0) {
+    case 0:
+    case 1:
+      state0 = 0;
+      tBody = $.createTBody$0$x(document.querySelector("#tb_news"));
+      t1 = $.getInterceptor$asx(mapData);
+      len = t1.get$length(mapData);
+    case 2:
+      var t2, t3, i, $$id, t4, t5;
+      state0 = 0;
+      for (t2 = $.getInterceptor(len), t3 = $.getInterceptor$x(tBody), i = 0; $.JSNumber_methods.$lt(i, len); ++i) {
+        "" + i;
+        $$id = t3.insertRow$1(tBody, -1);
+        t4 = $.getInterceptor$x($$id);
+        t5 = t4.insertCell$1($$id, 0);
+        t5.textContent = t2.$eq(len, 0) === true ? null : $.$index$asx(t1.$index(mapData, i), "photo");
+        t5 = t4.insertCell$1($$id, 1);
+        t5.textContent = t2.$eq(len, 0) === true ? null : $.$index$asx(t1.$index(mapData, i), "title");
+        t5 = t4.insertCell$1($$id, 2);
+        t5.textContent = t2.$eq(len, 0) === true ? null : $.$index$asx(t1.$index(mapData, i), "time");
+        t4 = t4.insertCell$1($$id, 3);
+        t4.textContent = t2.$eq(len, 0) === true ? null : $.$index$asx(t1.$index(mapData, i), "description");
+      }
+  }
 };
 
 $.resetImages = function(index) {
@@ -14053,8 +14201,45 @@ $.resetImages = function(index) {
   $.replaceWith$1$x(document.querySelector(t1), iIma);
 };
 
-$.getIMAGE = function(uploadInput) {
-  $.get$onChange$x(uploadInput).listen$1(new $.getIMAGE_anon(uploadInput));
+$.uploadImages = function(uploadInput) {
+  var files, t1, file, reader;
+  if ($.$lt$n($.index, 4) === true) {
+    files = $.get$files$x(uploadInput);
+    t1 = $.getInterceptor(files);
+    if (files != null)
+      if ($.$eq(t1.get$length(files), 1) === true) {
+        file = t1.$index(files, 0);
+        reader = new FileReader();
+        $.get$onLoad$x(reader).listen$1(new $.uploadImages_anon(reader));
+        reader.readAsDataURL(file);
+      }
+  }
+  if ($.$eq($.index, 4) === true) {
+    files = $.get$files$x(uploadInput);
+    t1 = $.getInterceptor(files);
+    if (files != null)
+      if ($.$eq(t1.get$length(files), 1) === true) {
+        file = t1.$index(files, 0);
+        reader = new FileReader();
+        $.get$onLoad$x(reader).listen$1(new $.uploadImages_anon0(reader));
+        reader.readAsDataURL(file);
+      }
+  }
+  $.index = $.$add$ns($.index, 1);
+};
+
+$.swapImage = function() {
+  var img4, img3, img2, t1, t2;
+  img4 = document.querySelector("#IMG_4");
+  img3 = document.querySelector("#IMG_3");
+  img2 = document.querySelector("#IMG_2");
+  t1 = $.getInterceptor$x(img2);
+  $.set$src$x(document.querySelector("#IMG_1"), t1.get$src(img2));
+  t2 = $.getInterceptor$x(img3);
+  t1.set$src(img2, t2.get$src(img3));
+  t1 = $.getInterceptor$x(img4);
+  t2.set$src(img3, t1.get$src(img4));
+  t1.set$src(img4, $.data);
 };
 
 $.showIMG = function(iD, data) {
@@ -14115,7 +14300,7 @@ $.ajaxSendJSON = function() {
       $.replaceWith$1$x(document.querySelector("#error"), elem);
     if (document.querySelector("#info") != null)
       $.replaceWith$1$x(document.querySelector("#info"), elem);
-    $._sendJSON("POST", "/send", jsonData);
+    $._sendJSON("POST", "/send", jsonData, "application/json");
     len = $.get$length$asx($.get$photoData());
     if ($.$gt$n(len, 4) === true)
       len = 4;
@@ -14125,7 +14310,7 @@ $.ajaxSendJSON = function() {
       tmp = $.$index$asx($.get$photoData(), i);
       input = $.S(input) + $.S(tmp);
     }
-    $._sendPNG("POST", "/png", input);
+    $._sendJSON("POST", "/png", input, "text/plain");
     return true;
   } else {
     elem = document.createElement("label");
@@ -14156,7 +14341,7 @@ $.ajaxSendJSON$bailout = function(state0, len) {
               $.replaceWith$1$x(document.querySelector("#error"), elem);
             if (document.querySelector("#info") != null)
               $.replaceWith$1$x(document.querySelector("#info"), elem);
-            $._sendJSON("POST", "/send", jsonData);
+            $._sendJSON("POST", "/send", jsonData, "application/json");
             len = $.get$length$asx($.get$photoData());
             if ($.$gt$n(len, 4) === true)
               len = 4;
@@ -14166,7 +14351,7 @@ $.ajaxSendJSON$bailout = function(state0, len) {
               tmp = $.$index$asx($.get$photoData(), i);
               input = $.S(input) + $.S(tmp);
             }
-            $._sendPNG("POST", "/png", input);
+            $._sendJSON("POST", "/png", input, "text/plain");
             return true;
         }
       else {
@@ -14182,26 +14367,15 @@ $.ajaxSendJSON$bailout = function(state0, len) {
   }
 };
 
-$._sendJSON = function(method, url, jsonData) {
+$._sendJSON = function(method, url, jsonData, countenType) {
   var request, t1;
   request = new XMLHttpRequest();
   t1 = $.getInterceptor$x(request);
   t1.get$onReadyStateChange(request).listen$1(new $._sendJSON_anon(request));
-  $.Primitives_printString("Sending JSON to the server...");
+  $.Primitives_printString("Sending data to the server...");
   t1.open$2(request, method, url);
-  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader("Content-Type", countenType);
   request.send(jsonData);
-};
-
-$._sendPNG = function(method, url, pngData) {
-  var request, t1;
-  request = new XMLHttpRequest();
-  t1 = $.getInterceptor$x(request);
-  t1.get$onReadyStateChange(request).listen$1(new $._sendPNG_anon(request));
-  $.Primitives_printString("Sending Photos to the server...");
-  t1.open$2(request, method, url);
-  request.setRequestHeader("Content-Type", "text/plain");
-  request.send(pngData);
 };
 
 $.mapStringJSON = function() {
@@ -14270,18 +14444,33 @@ $.infoContent = function(vTitle, vUserTime, vDescription, vPhoto, divEle) {
   divEle.push($content);
 };
 
+$.processInfo = function(infoString) {
+  var info, t1;
+  info = $.parse(infoString, null);
+  t1 = $.getInterceptor(info);
+  if (info != null) {
+    $.currentpages = t1.$index(info, "currentpage");
+    $.totalpages = t1.$index(info, "totalpage");
+    $.Primitives_printString("xpageNumber: " + $.S($.currentpages));
+    $.Primitives_printString("xtotalpages: " + $.S($.totalpages));
+  } else
+    $.Primitives_printString("There are no INFO data!");
+};
+
 $.processString = function(jsonString) {
   var news = $.parse(jsonString, null);
-  if ($.$eq($.get$length$asx(news), 0) !== true)
+  if (news != null)
     $.jsonData = news;
-  else
+  else {
+    $.Primitives_printString("There are no JSON data!");
     $.jsonData = null;
+  }
 };
 
 $.processPNG = function(data) {
   var t1, startCol, endCol, indexI, t2, tmp, indexJ, newsList, i, sli, rows, j, row, str, index, newsRows, m, temp, newsRow, rl, str2, str3, str4;
-  t1 = $.getInterceptor$asx(data);
-  if ($.$eq(t1.get$length(data), 0) !== true) {
+  t1 = $.getInterceptor(data);
+  if (data != null) {
     startCol = $.List_List($);
     startCol.push(0);
     endCol = $.List_List($);
@@ -14361,9 +14550,13 @@ $.processPNG = function(data) {
       newsRows.push(newsRow);
     }
     $.photoReturned = newsRows;
-  } else
+  } else {
     $.Primitives_printString("There are not any photos!");
+    $.photoReturned = null;
+  }
   $.loadMap($.get$jsonData(), $.get$photoReturned(), "markerImg.png");
+  if ($.get$jsonData() != null)
+    $.createTable($.get$jsonData());
 };
 
 $.Arrays_copy = function(src, srcStart, dst, dstStart, count) {
@@ -17119,6 +17312,8 @@ $._deserializeElement = function(id) {
   return e;
 };
 
+$.processInfo.call$1 = $.processInfo;
+$.processInfo.$name = "processInfo";
 $.processString.call$1 = $.processString;
 $.processString.$name = "processString";
 $.processPNG.call$1 = $.processPNG;
@@ -17169,26 +17364,26 @@ $.num = {builtin$cls: "num"};
 $.Match = {builtin$cls: "Match"};
 $._ManagerStub = {builtin$cls: "_ManagerStub"};
 $.String = {builtin$cls: "String"};
+$.List = {builtin$cls: "List"};
 $.bool = {builtin$cls: "bool"};
 $.$double = {builtin$cls: "$double"};
 $.ReceivePort = {builtin$cls: "ReceivePort"};
 $.$int = {builtin$cls: "$int"};
-$.List = {builtin$cls: "List"};
 $.Map = {builtin$cls: "Map"};
 $.C__NullKey = new $._NullKey();
 $.EventStreamProvider_success = new $.EventStreamProvider("success");
 $.EventStreamProvider_mouseout = new $.EventStreamProvider("mouseout");
+$.EventStreamProvider_change = new $.EventStreamProvider("change");
+$.C_Object = new $.Object();
 Isolate.makeConstantList = function(list) {
   list.immutable$list = true;
   list.fixed$length = true;
   return list;
 };
 $.List_empty = Isolate.makeConstantList([]);
-$.EventStreamProvider_change = new $.EventStreamProvider("change");
-$.EventStreamProvider_readystatechange = new $.EventStreamProvider("readystatechange");
+$.EventStreamProvider_error = new $.EventStreamProvider("error");
 $.C__LinkedHashTableHeadMarker = new $._LinkedHashTableHeadMarker();
 $.EventStreamProvider_mouseover = new $.EventStreamProvider("mouseover");
-$.C_Object = new $.Object();
 $.EventStreamProvider_keypress = new $.EventStreamProvider("keypress");
 $.EventStreamProvider_dragstart = new $.EventStreamProvider("dragstart");
 $.C_Interceptor = new $.Interceptor();
@@ -17204,13 +17399,15 @@ $.JSNull_methods = $.JSNull.prototype;
 $.EventStreamProvider_drop = new $.EventStreamProvider("drop");
 $.JSNumber_methods = $.JSNumber.prototype;
 $.JSString_methods = $.JSString.prototype;
-$.EventStreamProvider_error = new $.EventStreamProvider("error");
+$.EventStreamProvider_readystatechange = new $.EventStreamProvider("readystatechange");
 $.C_CloseToken = new $.CloseToken();
 $.C__DeadEntry = new $._DeadEntry();
 $.map = null;
 $.geocoder = null;
 $.data = null;
 $.index = 0;
+$.currentpages = 1;
+$.totalpages = 0;
 $.dispatchPropertyName = "_zzyzx";
 $.lazyPort = null;
 $.ReceivePortImpl__nextFreeId = 1;
@@ -17341,6 +17538,12 @@ $.concat$1$s = function(receiver, a0) {
 $.contains$1$asx = function(receiver, a0) {
   return $.getInterceptor$asx(receiver).contains$1(receiver, a0);
 };
+$.createTBody$0$x = function(receiver) {
+  return $.getInterceptor$x(receiver).createTBody$0(receiver);
+};
+$.createTHead$0$x = function(receiver) {
+  return $.getInterceptor$x(receiver).createTHead$0(receiver);
+};
 $.elementAt$1$ax = function(receiver, a0) {
   return $.getInterceptor$ax(receiver).elementAt$1(receiver, a0);
 };
@@ -17437,6 +17640,12 @@ $.get$responseText$x = function(receiver) {
 $.get$result$x = function(receiver) {
   return $.getInterceptor$x(receiver).get$result(receiver);
 };
+$.get$tHead$x = function(receiver) {
+  return $.getInterceptor$x(receiver).get$tHead(receiver);
+};
+$.get$target$x = function(receiver) {
+  return $.getInterceptor$x(receiver).get$target(receiver);
+};
 $.get$value$x = function(receiver) {
   return $.getInterceptor$x(receiver).get$value(receiver);
 };
@@ -17448,6 +17657,12 @@ $.getCurrentPosition$0$x = function(receiver) {
 };
 $.indexOf$2$asx = function(receiver, a0, a1) {
   return $.getInterceptor$asx(receiver).indexOf$2(receiver, a0, a1);
+};
+$.insertCell$1$x = function(receiver, a0) {
+  return $.getInterceptor$x(receiver).insertCell$1(receiver, a0);
+};
+$.insertRow$1$x = function(receiver, a0) {
+  return $.getInterceptor$x(receiver).insertRow$1(receiver, a0);
 };
 $.lookupPort$1$x = function(receiver, a0) {
   return $.getInterceptor$x(receiver).lookupPort$1(receiver, a0);
@@ -19023,7 +19238,7 @@ function init() {
         }
       }
     }
-    var objectClassObject = collectedClasses.Object, shortNames = "lat$0,lng$0,pop$0,call$0,call$1,call$2,call$3,call$4,eval$1,get$OK,get$sb,push$1,then$1,toJs$0,get$Map,get$_id,get$DROP,get$Date,get$_tag,get$maps,lookup$1,set$icon,toJson$0,get$cause,process$0,toLocal$0,_writeOn$1,callSync$1,get$LatLng,get$Marker,get$_state,get$future,get$google,moveNext$0,register$2,set$_state,set$center,set$shadow,_callback$2,_dispatch$1,_sendData$1,exitScope$0,get$ROADMAP,get$current,set$_handle,_sendError$1,_sendValue$1,catchError$1,enterScope$0,get$Geocoder,get$_jsProxy,get$isWorker,get$sendPort,invalidate$1,toSendPort$0,unregister$1,_setGlobals$0,get$Animation,get$MapTypeId,get$_callback,get$_duration,get$_registry,get$_workerId,set$mapTypeId,get$InfoWindow,get$_hashTable,get$_isolateId,get$stackTrace,runIteration$0,throwDelayed$0,_checkReplyTo$1,completeError$2,get$_futurePort,get$ZERO_RESULTS,get$_liblib3$_id,get$_receivePort,get$topEventLoop,get$UNKNOWN_ERROR,get$_instantiator,get$_liblib6$_set,get$_nextListener,get$_scopeIndices,get$nextIsolateId,set$_nextListener,set$nextIsolateId,get$GeocoderStatus,get$REQUEST_DENIED,get$currentContext,get$inMilliseconds,get$INVALID_REQUEST,_liblib4$_callback$1,get$OVER_QUERY_LIMIT,get$formattedAddress,get$formatted_address,get$StreetViewPanorama,get$_hasUnhandledError,get$_resultOrListeners,get$millisecondsSinceEpoch".split(","), longNames = "lat,lng,pop,call,call,call,call,call,eval,OK,sb,push,then,toJs,Map,_id,DROP,Date,_tag,maps,lookup,icon=,toJson,cause,process,toLocal,_writeOn,callSync,LatLng,Marker,_state,future,google,moveNext,register,_state=,center=,shadow=,_callback,_dispatch,_sendData,exitScope,ROADMAP,current,_handle=,_sendError,_sendValue,catchError,enterScope,Geocoder,_jsProxy,isWorker,sendPort,invalidate,toSendPort,unregister,_setGlobals,Animation,MapTypeId,_callback,_duration,_registry,_workerId,mapTypeId=,InfoWindow,_hashTable,_isolateId,stackTrace,runIteration,throwDelayed,_checkReplyTo,completeError,_futurePort,ZERO_RESULTS,_id,_receivePort,topEventLoop,UNKNOWN_ERROR,_instantiator,_set,_nextListener,_scopeIndices,nextIsolateId,_nextListener=,nextIsolateId=,GeocoderStatus,REQUEST_DENIED,currentContext,inMilliseconds,INVALID_REQUEST,_callback,OVER_QUERY_LIMIT,formattedAddress,formatted_address,StreetViewPanorama,_hasUnhandledError,_resultOrListeners,millisecondsSinceEpoch".split(",");
+    var objectClassObject = collectedClasses.Object, shortNames = "lat$0,lng$0,pop$0,call$0,call$1,call$2,call$3,call$4,eval$1,get$OK,get$sb,push$1,then$1,toJs$0,get$Map,get$_id,get$DROP,get$Date,get$_tag,get$maps,lookup$1,set$icon,toJson$0,get$cause,process$0,toLocal$0,_writeOn$1,callSync$1,get$LatLng,get$Marker,get$_state,get$future,get$google,moveNext$0,register$2,set$_state,set$center,set$shadow,_callback$2,_dispatch$1,_sendData$1,exitScope$0,get$ROADMAP,get$current,set$_handle,_sendError$1,_sendValue$1,catchError$1,enterScope$0,get$Geocoder,get$_jsProxy,get$isWorker,get$sendPort,invalidate$1,toSendPort$0,unregister$1,_setGlobals$0,get$Animation,get$MapTypeId,get$_callback,get$_duration,get$_registry,get$_workerId,set$mapTypeId,get$InfoWindow,get$_hashTable,get$_isolateId,get$stackTrace,runIteration$0,throwDelayed$0,_checkReplyTo$1,completeError$2,get$_futurePort,get$ZERO_RESULTS,get$_liblib3$_id,get$_receivePort,get$topEventLoop,get$UNKNOWN_ERROR,get$_instantiator,get$_liblib6$_set,get$_nextListener,get$_scopeIndices,get$nextIsolateId,set$_nextListener,set$nextIsolateId,get$GeocoderStatus,get$REQUEST_DENIED,get$currentContext,get$inMilliseconds,get$INVALID_REQUEST,_liblib2$_callback$1,get$OVER_QUERY_LIMIT,get$formattedAddress,get$formatted_address,get$StreetViewPanorama,get$_hasUnhandledError,get$_resultOrListeners,get$millisecondsSinceEpoch".split(","), longNames = "lat,lng,pop,call,call,call,call,call,eval,OK,sb,push,then,toJs,Map,_id,DROP,Date,_tag,maps,lookup,icon=,toJson,cause,process,toLocal,_writeOn,callSync,LatLng,Marker,_state,future,google,moveNext,register,_state=,center=,shadow=,_callback,_dispatch,_sendData,exitScope,ROADMAP,current,_handle=,_sendError,_sendValue,catchError,enterScope,Geocoder,_jsProxy,isWorker,sendPort,invalidate,toSendPort,unregister,_setGlobals,Animation,MapTypeId,_callback,_duration,_registry,_workerId,mapTypeId=,InfoWindow,_hashTable,_isolateId,stackTrace,runIteration,throwDelayed,_checkReplyTo,completeError,_futurePort,ZERO_RESULTS,_id,_receivePort,topEventLoop,UNKNOWN_ERROR,_instantiator,_set,_nextListener,_scopeIndices,nextIsolateId,_nextListener=,nextIsolateId=,GeocoderStatus,REQUEST_DENIED,currentContext,inMilliseconds,INVALID_REQUEST,_callback,OVER_QUERY_LIMIT,formattedAddress,formatted_address,StreetViewPanorama,_hasUnhandledError,_resultOrListeners,millisecondsSinceEpoch".split(",");
     for (var j = 0; j < shortNames.length; j++) {
       var type = 0;
       var short = shortNames[j];

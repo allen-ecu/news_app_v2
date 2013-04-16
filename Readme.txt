@@ -1,4 +1,37 @@
 Change Log:
+V2.9
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+Pagenite
+
+Next:
+-------------------------------
+Restrict the data up to today
+Create List
+Redesign html
+Save date to WebDB or IndexedDB
+Load news from DB and send to client
+
+What has changed?
+-------------------------------
+Add page next prev function
+Add load list
+fix some minor issues
+Steam upgraded to v0.6.2
+Dart Editor 0.4.5_r21094
+Dat SDK 0.4.5.1_r21094
+Server: main.dart
+Client: 10.1.1.11:5050
+The localhost has changed to 10.1.1.11:5050 for testing in my case.
+You must use r20602 version and Stream v0.6.2 to in order to run the codes correctly.
+
+Versions:
+-------------------------------
+Last Version: V2.8
+This Version: V2.9
+
+Change Log:
 V2.8
 ------------------------------------------------------------------
 What to Fix:
