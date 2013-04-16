@@ -30,7 +30,7 @@ $$.main_anon = {"": "Closure;",
         $.HttpRequest_getString("/receiveinfo", null, null).then$1($.processInfo);
         $.Primitives_printString("currentpages: " + $.S($.currentpages));
       }
-    } else
+    } else if ($.$eq($.currentpages, $.totalpages) === true)
       $.Primitives_printString("You are at last page.");
   }
 };
@@ -52,7 +52,7 @@ $$.main_anon0 = {"": "Closure;",
         $.HttpRequest_getString("/receiveinfo", null, null).then$1($.processInfo);
         $.Primitives_printString("currentpages: " + $.S($.currentpages));
       }
-    } else
+    } else if ($.$eq($.currentpages, 0) === true)
       $.Primitives_printString("You are at first page.");
   }
 };

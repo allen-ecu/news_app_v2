@@ -12,6 +12,7 @@ num itemsperfetch = 4;//min: 1
 num currentpage;
 num totalpage;
 num pageNum = 1;
+num userCount = 0;
 List<num> pageIndex = new List<num>();
 
 //NO NEED HttpServer IF YOU ARE USING RIKULO STREAM SERVER, BECAUSE YOU DO NOT NEED TWO SERVERS
@@ -143,7 +144,7 @@ void sendJSON(HttpConnect connect) {
   var request = connect.request;
   var response = connect.response;
   if(request.uri.path == '/receive' && request.method == 'GET')
-  {
+  { 
     File jsonDoc = new File('JSON.json');
     //use Sync method
     String data = jsonDoc.readAsStringSync();

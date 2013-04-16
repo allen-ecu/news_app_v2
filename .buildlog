@@ -11912,3 +11912,213 @@ build.dart --machine --changed=Readme.txt
 
 build.dart finished [125 ms]
 
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [109 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [90 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [93 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [88 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [147 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [84 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [89 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [108 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [88 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [106 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [89 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [87 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [87 ms]
+
+---
+build.dart --machine --changed=web\webapp\serverInfo.dart
+
+build.dart finished [111 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [118 ms]
+
+---
+build.dart --machine --changed=web\client.dart.js --changed=web\client.dart.js.deps --changed=web\client.dart.j...
+
+build.dart finished [84 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [91 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [109 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [109 ms]
+
+---
+build.dart --machine --changed=web\client.dart.js --changed=web\client.dart.js.deps --changed=web\client.dart.j...
+
+build.dart finished [558 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [86 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [91 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [104 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [98 ms]
+
+---
+build.dart --machine --changed=web\client.dart.js --changed=web\client.dart.js.deps --changed=web\client.dart.j...
+
+build.dart finished [91 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [93 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [101 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [90 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [87 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [88 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [111 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [87 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [116 ms]
+
+---
+build.dart --machine --changed=web\client.dart
+
+build.dart finished [114 ms]
+
+---
+build.dart --machine --changed=web\client.dart.js --changed=web\client.dart.js.deps --changed=web\client.dart.j...
+
+build.dart finished [113 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [108 ms]
+
+---
+build.dart --machine --changed=web\client.dart --changed=web\client.dart.js --changed=web\client.dart.js.deps -...
+
+build.dart finished [107 ms]
+

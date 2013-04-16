@@ -55,7 +55,7 @@ void main() {
   
   //next page event
   query('#next').onClick.listen((e){
-    if(currentpages<totalpages)
+    if(currentpages < totalpages)
     {
         ajaxSendInfo(currentpages+1);
         if(resetTable())
@@ -66,7 +66,7 @@ void main() {
         print('currentpages: $currentpages');
         }
     }
-    else
+    else if(currentpages == totalpages)
     {
       print('You are at last page.');
     }
@@ -74,7 +74,7 @@ void main() {
   
   //previous page event
   query('#pre').onClick.listen((e){
-    if(currentpages>1)
+    if(currentpages > 1)
     {
         ajaxSendInfo(currentpages-1);
         if(resetTable())
@@ -85,7 +85,7 @@ void main() {
         print('currentpages: $currentpages');
         }
     }
-    else
+    else if(currentpages == 0)
     {
       print('You are at first page.');
     }
