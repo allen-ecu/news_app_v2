@@ -19,7 +19,7 @@ fix some minor issues
 Warning: not compatiable with version higher than r20602, such as M4 (v21823)
 Steam upgraded to v0.7.0
 Dart Editor 0.4.3_r20602
-Dat SDK 0.4.3.5_r20602
+Dart SDK 0.4.3.5_r20602
 Server: main.dart
 Client: 10.1.1.11:5050
 The localhost has changed to 10.1.1.11:5050 for testing in my case.
