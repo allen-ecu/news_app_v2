@@ -46,8 +46,15 @@ final String defaultPhotoSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ
 num itemsperpage = 2;
 num itemsperfetch = 4;
 num currentpages = 1;
-num totalpages = 0;
+num totalpages = 1;
 void main() {
+  //initialize cookies
+  document.cookie = 'Current=1';
+  document.cookie = 'Total=2';
+  var curLbl = query('#curPage');
+  curLbl.text = 'Current: 1';
+  var totLbl = query('#totPage');
+  totLbl.text = 'Max: 2';
   //receive JSON from the server
   ajaxGetJSON();
   ajaxGetPNG();
@@ -57,38 +64,44 @@ void main() {
   query('#next').onClick.listen((e){
     if(currentpages < totalpages)
     {
-        ajaxSendInfo(currentpages+1);
+        currentpages = currentpages+1;
+        query('#curPage').text = 'Current: $currentpages';
+        query('#totPage').text = 'Max: $totalpages';
+        ajaxSendInfo(currentpages);   
         if(resetTable())
         {
-        ajaxGetJSON();
-        ajaxGetPNG();
-        ajaxGetInfo();
-        print('currentpages: $currentpages');
+          ajaxGetInfo();
+          ajaxGetJSON();
+          ajaxGetPNG();
         }
     }
     else if(currentpages == totalpages)
     {
       print('You are at last page.');
     }
+    print(currentpages);
   });
   
   //previous page event
   query('#pre').onClick.listen((e){
     if(currentpages > 1)
     {
-        ajaxSendInfo(currentpages-1);
+        currentpages = currentpages -1;
+        query('#curPage').text = 'Current: $currentpages';
+        query('#totPage').text = 'Max: $totalpages';
+        ajaxSendInfo(currentpages);
         if(resetTable())
         {
-        ajaxGetJSON();
-        ajaxGetPNG();
-        ajaxGetInfo();
-        print('currentpages: $currentpages');
+          ajaxGetInfo();
+          ajaxGetJSON();
+          ajaxGetPNG();
         }
     }
-    else if(currentpages == 0)
+    else if(currentpages == 1)
     {
       print('You are at first page.');
     }
+    print(currentpages);
   });
   //validate title input
   query('#title').onKeyPress.listen((e){
@@ -105,18 +118,6 @@ void main() {
     print('Uploading photos!');
     uploadImages(e.target);
   });
-  /*
-  try
-  {
-  print('Uploading photos!');
-  InputElement uploadInput = query('#photo');
-  getIMAGE(uploadInput);
-  }
-  catch(e)
-  {
-    print('upload error: $e');
-  }
-  */
   
   //submit user input(JSON) to the server
   query('#submit').onClick.listen((e){
@@ -372,7 +373,7 @@ bool ajaxSendJSON()
   
   if(!(jsonData == 'false')&& pngData == true)
   {
-    
+    print('Client: sending JSON:');
     var elem = new LabelElement();
     elem.id = 'ok';
     elem.text = 'Message Successfully Sent!';
@@ -387,6 +388,7 @@ bool ajaxSendJSON()
     
     _sendJSON('POST', '/send', jsonData, 'application/json');
     
+    print('Client: sending PNG:');
     int len = photoData.length;
     if(len > 4)//send first four photos only
       len = 4;
@@ -440,7 +442,16 @@ void _sendJSON(String method, String url,var jsonData, String countenType) {
 void ajaxSendInfo(num pageNumber){
   if(pageNumber > 0 && pageNumber <= totalpages)
   {
-    print('sending pagenum info');
+    print('Client: Sending pagenum Info');
+    
+    //set cookie
+    document.cookie = 'Current=$pageNumber';
+    //num index = cook.indexOf(';');
+    //String cur = cook.substring(0, index);
+    //String tot = cook.substring(index+2);
+    //print(cur);
+    //print(tot); 
+    //send pageNumber
   _sendJSON('POST', '/sendinfo', pageNumber, 'text/plain');
   }
 }
@@ -503,27 +514,38 @@ void loadMap(List<Map> data, List<List<String>> album, var MarkerImage) {
     
     //Get geographic address from Latitude and Longitude:
     geocoder = jsw.retain(new gm.Geocoder());
-    final gm.LatLng latlng = jsw.retain(new gm.LatLng(double.parse(window.localStorage['Lat']), double.parse(window.localStorage['Lng'])));
-    final request = new gm.GeocoderRequest()
-      ..location = latlng  // TODO bad variable "latlng" in example code
+    
+    if(window.localStorage['Lat'] != null && window.localStorage['Lng'] != null)
+    {
+      final gm.LatLng latlng = jsw.retain(new gm.LatLng(double.parse(window.localStorage['Lat']), double.parse(window.localStorage['Lng'])));
+    
+      final request = new gm.GeocoderRequest()
+      ..location = latlng
       ;
     
-    //call geocoder to fetch address:
-    geocoder.geocode(request, (List<gm.GeocoderResult> results, gm.GeocoderStatus status) {
-      if (status == gm.GeocoderStatus.OK) {
-        if (results[0] != null) {
-          jsw.release(latlng);
-          window.localStorage['Address'] = results[0].formattedAddress;
+      //call geocoder to fetch address:
+      geocoder.geocode(request, (List<gm.GeocoderResult> results, gm.GeocoderStatus status) {
+        if (status == gm.GeocoderStatus.OK) {
+          if (results[0] != null) {
+            jsw.release(latlng);
+            window.localStorage['Address'] = results[0].formattedAddress;
+          } else {
+            window.alert('No results found');
+          }
         } else {
-          window.alert('No results found');
+          window.alert('Geocoder failed due to: ${status}');
         }
-      } else {
-        window.alert('Geocoder failed due to: ${status}');
-      }
-    });
+      });
+    
+    }
+    else
+    {
+      window.localStorage['Lat'] = '0';
+      window.localStorage['Lng'] = '0';
+      window.localStorage['Address'] = 'NULL';
+    }
     
     //Google map:
-    
     //set map options
     final mapOptions = new gm.MapOptions()
       ..zoom = 4
@@ -712,8 +734,8 @@ processInfo(String infoString) {
   {
     currentpages = info['currentpage'];
     totalpages = info['totalpage'];
-    print('xpageNumber: $currentpages');
-    print('xtotalpages: $totalpages');
+    print('Current Page: $currentpages');
+    print('Total Page: $totalpages');
   }
   else
   {
@@ -859,7 +881,14 @@ processPNG(String data) {
     photoReturned = null;
   }
   //load Map
+  if(jsonData != null && photoReturned != null)
+  {
   loadMap(jsonData, photoReturned, markerImg);
+  }
+  else
+  {
+    print('cant load map due to feed empty!');
+  }
   //load table
   if(jsonData != null)
   {
@@ -869,7 +898,7 @@ processPNG(String data) {
 
 //get json data from server
 void ajaxGetJSON(){
- 
+  print('Client: receiving JSON:');
   var url = "/receive";
   // call the web server asynchronously
   var request = HttpRequest.getString(url).then(processString);
@@ -877,16 +906,29 @@ void ajaxGetJSON(){
 
 //get png data from server
 void ajaxGetPNG(){
- 
+  print('Client: receiving PNG:');
   var url = "/pngreceive";
   // call the web server asynchronously
   var request = HttpRequest.getString(url).then(processPNG);
 }
 
+String readCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  print('ca: $ca');
+  for(var i=0;i < ca.length;i++) {
+    var c = ca[i];
+    while (c.substring(0)==' ') c = c.substring(1,c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
 //get png data from server
 void ajaxGetInfo(){
- print('get information now:');
+ print('Client: receiving Info:');
   var url = "/receiveinfo";
   // call the web server asynchronously
   var request = HttpRequest.getString(url).then(processInfo);
+  
 }

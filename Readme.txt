@@ -1,4 +1,36 @@
 Change Log:
+V3.0
+------------------------------------------------------------------
+What to Fix:
+-----------------------------
+IndexRangerError
+Next, Pre buttons
+
+Next:
+-------------------------------
+Mouseover news event: popup photos
+
+What has changed?
+-------------------------------
+Add cookies, sessions
+Support more than one user
+Add current page number, total pages
+fix some minor issues
+Warning: not compatiable with version higher than r20602, such as M4 (v21823)
+Steam upgraded to v0.7.0
+Dart Editor 0.4.3_r20602
+Dat SDK 0.4.3.5_r20602
+Server: main.dart
+Client: 10.1.1.11:5050
+The localhost has changed to 10.1.1.11:5050 for testing in my case.
+You must use r20602 version and Stream v0.6.2 to in order to run the codes correctly.
+
+Versions:
+-------------------------------
+Last Version: V2.9
+This Version: V3.0
+
+Change Log:
 V2.9
 ------------------------------------------------------------------
 What to Fix:

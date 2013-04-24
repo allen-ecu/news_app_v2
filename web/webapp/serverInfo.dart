@@ -13,6 +13,7 @@ num currentpage;
 num totalpage;
 num pageNum = 1;
 num userCount = 0;
+bool firstRun;
 List<num> pageIndex = new List<num>();
 
 //NO NEED HttpServer IF YOU ARE USING RIKULO STREAM SERVER, BECAUSE YOU DO NOT NEED TWO SERVERS
@@ -76,13 +77,11 @@ void receiveJSON(HttpConnect connect){
     //raw.forEach((int key)=>response.addString(new String.fromCharCode(key)));
     response.write(' Received Content Length of: ');
     response.write(request.contentLength.toString());
-    connect.close();
   }
   else
   {
     response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
-    connect.close();
   }
 }
 
@@ -118,7 +117,6 @@ void receivePNG(HttpConnect connect){
       }
       response.write(' Received PNG Length of: ');
       response.write(request.contentLength.toString());
-      connect.close();
     }
     stream.listen((String value){
       //save data to string progressively
@@ -132,31 +130,176 @@ void receivePNG(HttpConnect connect){
   {
     response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
-    connect.close();
+  }
+}
+
+//Maintain one session of one user
+List<String> authoriseUsr(HttpRequest req, num currentpages, num totalpages, num mode){
+  HttpSession usrSession = req.session;
+  String ip = req.headers.host;
+  String sessID = 'ID_$ip';
+  String sessCurPage =  'CurPage_$ip';
+  String sessTotalPage = 'TotalPage_$ip';
+  try
+  {
+      //new user
+      if(mode == 0)
+      {
+        print('Create new user:');
+        print(usrSession.id);
+      }
+      else
+      {
+        print('Returned user:');
+        print(usrSession.id);
+      }
+      String tmp = usrSession.id;
+      usrSession[sessID] = tmp;
+      usrSession[sessCurPage] = currentpages;
+      usrSession[sessTotalPage] = totalpages;
+      return [usrSession.id, currentpages, totalpages];
+  }
+  catch(e)
+  {
+    print(e);
+  }
+}
+
+String isFirstRun(HttpRequest req){
+  var listCookie = req.cookies;
+  String dartSessID;
+  getSessonValue(var v)
+  {
+    if(v.name == 'dartsessid')
+    {
+      dartSessID = v.value;
+      print('Find Cookie Info!');
+    }
+  }
+  listCookie.forEach((v)=> getSessonValue(v));
+  return dartSessID;
+}
+
+List<num> getCurrentTotalCookie(HttpRequest req){
+  var listCookie = req.cookies;
+  num current,total;
+  getSessonValue(var v)
+  {
+    if(v.name == 'current')
+    {
+      String tmp = v.value;
+      current = int.parse(tmp);
+      print('Find Current Info!');
+    }
+    if(v.name == 'total')
+    {
+      String tmp = v.value;
+      total = int.parse(tmp);
+      print('Find Total Info!');
+    }
+  }
+  listCookie.forEach((v)=> getSessonValue(v));
+  return [current,total];
+}
+
+List<String> changeSession(HttpRequest req, num mode, num curPage, num totPage){
+  String ip = req.headers.host;
+  //privous user
+  String ID = req.session.id;
+  String sessID = 'ID_$ID';
+  String sessCurPage =  'CurPage_$ip';
+  String sessTotalPage = 'TotalPage_$ip';
+  
+  HttpSession usrSession = req.session;
+  try
+  {
+    if(mode == 1)
+    {
+      //Setter: change session value
+      usrSession[sessCurPage] = curPage;
+      return null;
+    }
+    else if (mode == 2)
+    {
+      //Setter: change session value
+      usrSession[sessCurPage] = curPage;
+      usrSession[sessTotalPage] = totPage;
+      return null;
+    }
+    else
+    {
+      print('returned user');
+      //Getter: get session value
+      String ID = usrSession[sessID];
+      String curPage = usrSession[sessCurPage];
+      String tolPage = usrSession[sessTotalPage];
+      return [ID, curPage, tolPage];
+    }
+  }
+  catch(e)
+  {
+    print(e);
   }
 }
 
 //Load local JSON.json data and send it to the browser
 void sendJSON(HttpConnect connect) {
-  
+  print('Server: sending JSON');
   print('News Item Preferred to Fetch: $itemsperfetch');
-  
   var request = connect.request;
   var response = connect.response;
   if(request.uri.path == '/receive' && request.method == 'GET')
-  { 
+  {
+    try
+    {
+    
     File jsonDoc = new File('JSON.json');
     //use Sync method
     String data = jsonDoc.readAsStringSync();
-  
+
     //reconstruct news string to news list
     List<String> newsList = buildNewsList(data);
     
     num totalnewslen = newsList.length;
     print('Total News Items: $totalnewslen');
     
+    if(isFirstRun(request) != null)
+      {firstRun = false;}
+    else
+      {firstRun = true;}
+    
+    num itemstofetch;
+    num currentpages;
+    num totalpages;
+    
+    List<num> pages = getPages(itemsperfetch,totalnewslen, pageNum);
+    itemstofetch = pages[0];
+    currentpages = pages[1];
+    totalpages = pages[2];
+
+    if(firstRun == false)
+    {
+      print('firstRun false');
+      List<num> curtotStr = getCurrentTotalCookie(request);
+      currentpages = curtotStr[0];
+      totalpages =curtotStr[1];
+      changeSession(request, 2, currentpages, totalpages);
+      pageNum = currentpages;
+      authoriseUsr(request, currentpages, totalpages, 1);
+    }
+    
+    //get usre info
+    if(firstRun == true)
+    {
+    print('firstRun true');
+    List<String> tmp = authoriseUsr(request, currentpages, totalpages, 0);
+    changeSession(request, 2, currentpages, totalpages);
+    print('Authorise succeeded!');
+    firstRun = false;
+    }
+    
     //generate page index
-    pageIndex = generatePageIndex(itemsperfetch, totalnewslen, pageNum);
+    pageIndex = generatePageIndex(itemstofetch, currentpages, totalpages, totalnewslen);
     
     if(pageIndex != null)
     {
@@ -166,9 +309,10 @@ void sendJSON(HttpConnect connect) {
     
     //only fetch the 'itemstofetch' number of news of currentpage
     String dataStr = buildStrToSend(newsList, pageIndex);
-    
     connect.response
     ..headers.contentType = contentTypes["application/json"]
+    ..headers.set('set-cookie', 'Current=$currentpages')//firstime use set
+    ..headers.add('set-cookie', 'Total=$totalpages')//secondtime use add
     ..write('[$dataStr]');
     }
     else
@@ -176,13 +320,18 @@ void sendJSON(HttpConnect connect) {
       response.write('PageIndex is null!');
       response.statusCode = HttpStatus.NOT_FOUND;
     }
+    
+    }
+    catch(e)
+    {
+      print(e);
+    }
   }
   else
   {
     response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
-  connect.close();
 }
 
 String buildStrToSend(List<String> newsList, List<num> pageIndex) {
@@ -238,54 +387,8 @@ List<String> buildNewsList(String data) {
   return newsList;
 }
 
-List<num> generatePageIndex(num itemsperfetch, num totalnewslen, num pageNum) {
-  
-  if(itemsperfetch == 0)
-  {
-    print('The server needs to fetch at least one news item!');
-    return null;
-  }
-  else if(totalnewslen == 0)
-  {
-    print('The server did not find any news items!');
-    return null;
-  }
-  else
-  {
-        // decide currentpage and totalpage
-        num itemstofetch,currentpages, totalpages;
-        if(itemsperfetch<totalnewslen)
-        {
-          //8<5
-          itemstofetch = itemsperfetch;
-          num tmp = totalnewslen/itemsperfetch;
-          totalpages = tmp.ceil();
-        
-          if(pageNum> 0 && pageNum <= totalpages)
-          {
-            currentpages = pageNum;
-          }
-          else
-          {
-            currentpages = 1;
-          }
-        }
-        else
-        {
-          //5
-          itemstofetch = totalnewslen;
-            currentpages = 1;
-            totalpages = 1;
-        }
-      
-        //debug
-        print('News Item to Fetch: $itemstofetch');
-        print('currentpage: $currentpages');
-        print('totalpages: $totalpages');
-        
-        currentpage = currentpages;
-        totalpage = totalpages;
-        
+List<num> generatePageIndex(num itemstofetch, num currentpages, num totalpages, num totalnewslen) {
+
         List<num> pageIndex = new List<num>();
         if(currentpages != totalpages)
         {
@@ -303,6 +406,52 @@ List<num> generatePageIndex(num itemsperfetch, num totalnewslen, num pageNum) {
           }
         }
         return pageIndex;
+}
+
+List<num> getPages(num itemsperfetch, num totalnewslen, num pageNum){
+  if(itemsperfetch == 0)
+  {
+    print('The server needs to fetch at least one news item!');
+    return null;
+  }
+  else if(totalnewslen == 0)
+  {
+    print('The server did not find any news items!');
+    return null;
+  }
+  else
+  {
+  num itemstofetch,currentpages, totalpages;
+  if(itemsperfetch<totalnewslen)
+  {
+    //8<5
+    itemstofetch = itemsperfetch;
+    num tmp = totalnewslen/itemsperfetch;
+    totalpages = tmp.ceil();
+    
+    if(pageNum> 0 && pageNum <= totalpages)
+    {
+      currentpages = pageNum;
+    }
+    else
+    {
+      currentpages = 1;
+    }
+  }
+  else
+  {
+    //5
+    itemstofetch = totalnewslen;
+    currentpages = 1;
+    totalpages = 1;
+  }
+  
+  //debug
+  print('News Item to Fetch: $itemstofetch');
+  print('currentpage: $currentpages');
+  print('totalpages: $totalpages');
+  
+  return [itemstofetch,currentpages,totalpages];
   }
 }
 
@@ -313,12 +462,14 @@ void receiveInfo(HttpConnect connect){
   String ip = request.connectionInfo.remoteHost;
   if(request.uri.path == '/sendinfo' && request.method == 'POST')
   { 
+    print('Server: receiving info');
     String res;
     var stream = request.transform(new StringDecoder());
     saveINFO()
     {
        pageNum = int.parse(res);
        print('Asking for Page: $pageNum');
+       changeSession(request, 1, pageNum, 0);
     }
     
     stream.listen((String value){
@@ -328,13 +479,13 @@ void receiveInfo(HttpConnect connect){
       onDone:() => saveINFO(),
       onError:(error) => print(error)
     );
-    connect.close();
   }
   else
   {
-    response.write('Receive Page Info Error!');
+    connect.response
+    ..headers.set('set-cookie', 'Current=$pageNum')
+    ..write('Receive Page Info Error!');
     response.statusCode = HttpStatus.NOT_FOUND;
-    connect.close();
   }
 }
 
@@ -343,20 +494,38 @@ void sendInfo(HttpConnect connect) {
   var response = connect.response;
   if(request.uri.path == '/receiveinfo' && request.method == 'GET')
   {
+    //get current page from session
+    print('Server: sending info');
+    List<num> curtotStr = getCurrentTotalCookie(request);
+    num tmpPageCurStr, tmpPageTolStr;
+    
+    if(curtotStr != null)
+    {
+      tmpPageCurStr = curtotStr[0];
+      tmpPageTolStr =curtotStr[1];
+    }
+    else
+    {
+      //run at first time
+      tmpPageCurStr = 1;
+      tmpPageTolStr = 2;
+    }
+    print(tmpPageCurStr);
+    print(tmpPageTolStr);
     Map obj = new Map();
-    obj['currentpage'] = pageNum;
-    obj['totalpage'] = totalpage;
+    obj['currentpage'] = tmpPageCurStr;
+    obj['totalpage'] = tmpPageTolStr;
     String data = Json.stringify(obj);
     connect.response
     ..headers.contentType = contentTypes["text/plain"]
     ..write('$data');
+
   }
   else
   {
     response.write('Something is wrong!');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
-    connect.close();
 }
 
 //Load local PNG.json data and send it to the browser
@@ -365,6 +534,9 @@ void sendPNG(HttpConnect connect) {
   var response = connect.response;
   if(request.uri.path == '/pngreceive' && request.method == 'GET')
   {
+    try
+    {
+    print('Server: sending PNG');
     String data, dataFinal;
     File jsonDoc = new File('JSON.json');
     data= jsonDoc.readAsStringSync();
@@ -388,13 +560,18 @@ void sendPNG(HttpConnect connect) {
       response.write('PageIndex is null!');
       response.statusCode = HttpStatus.NOT_FOUND;
     }
+    
+    }
+    catch(e)
+    {
+      print(e);
+    }
   }
   else
   {
     response.write('<a href=\'\\\'>Oops!Let us go home!</a>');
     response.statusCode = HttpStatus.NOT_FOUND;
   }
-    connect.close();
 }
 
 String buildPNGStrtoSend(List<String> itemsfetched, List<String> newsList) {

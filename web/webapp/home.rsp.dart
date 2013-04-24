@@ -3,7 +3,7 @@
 part of server;
 
 /** Template, home, for rendering the view. */
-void home(HttpConnect connect) { //2
+Future home(HttpConnect connect) { //#2
   var _cs_ = new List<HttpConnect>(), request = connect.request, response = connect.response;
 
   if (!connect.isIncluded)
@@ -41,7 +41,7 @@ void home(HttpConnect connect) { //2
   </div>
   
   <div id="news" class="news">
-  <h2>Lastest News<button id="pre">Previous</button><button id="next">Next</button></h2>
+  <h2>Lastest News<button id="pre">Previous</button><button id="next">Next</button><label id='curPage'></label><label id='totPage'></label></h2>
   <table id="tb_news">
     <tr>
       <td>Photo</td>
@@ -72,5 +72,5 @@ void home(HttpConnect connect) { //2
 </html>
 """); //#2
 
-  connect.close();
+  return $nnf();
 }
