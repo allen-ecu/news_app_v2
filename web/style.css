@@ -1,0 +1,120 @@
+﻿@import url("reset.css") screen;
+@import url("animation.css") screen;
+
+.content h1 {
+	font-size:48px;
+	color:#000;
+	text-shadow:0px 1px 1px #f4f4f4;
+	text-align:center;
+	padding:60px 0 30px;	
+}
+
+/* LAYOUT */
+.container {
+	overflow:hidden;
+	width:403px;
+}
+
+/* CONTENT SLIDER */
+#content-slider {
+	width:100%;
+	height:231px;
+	margin:10px auto 0;
+}
+/* SLIDER */
+#slider {
+	background:#000;
+	border:5px solid #eaeaea;
+	box-shadow:1px 1px 5px rgba(0,0,0,0.7);
+	height:216px;
+	width:388px;
+	margin:10px auto 0;
+	overflow:visible;
+	position:relative;
+}
+#mask {
+	overflow:hidden;
+	height:216px;
+}
+#slider ul {
+	margin:0;
+	padding:0;
+	position:relative;
+}
+#slider li {
+	width:388px;
+	height:216px;
+	position:absolute;
+	top:-216px;
+	list-style:none;
+}
+
+#slider li.i0_imganimation {
+    animation:cycle 25s linear infinite;	
+	-moz-animation:cycle 25s linear infinite;	
+	-webkit-animation:cycle 25s linear infinite;		
+}
+#slider li.i1_imganimation {
+    animation:cycletwo 25s linear infinite;
+	-moz-animation:cycletwo 25s linear infinite;
+	-webkit-animation:cycletwo 25s linear infinite;		
+}
+#slider li.i2_imganimation {
+	animation:cyclethree 25s linear infinite;
+	-moz-animation:cyclethree 25s linear infinite;
+	-webkit-animation:cyclethree 25s linear infinite;		
+}
+#slider li.i3_imganimation {
+	animation:cyclefour 25s linear infinite;
+	-moz-animation:cyclefour 25s linear infinite;
+	-webkit-animation:cyclefour 25s linear infinite;		
+}
+#slider li.i4_imganimation {
+	animation:cyclefive 25s linear infinite;
+	-moz-animation:cyclefive 25s linear infinite;
+	-webkit-animation:cyclefive 25s linear infinite;		
+}
+
+#slider .tooltip {
+	background:rgba(0,0,0,0.7);
+	width:390px;
+	height:40px;
+	position:relative;
+	bottom:75px;
+	left:-410px;
+	transition:all 0.3s ease-in-out;
+	-moz-transition:all 0.3s ease-in-out;
+	-webkit-transition:all 0.3s ease-in-out;  
+}
+#slider .tooltip h1 {
+	color:#fff;
+	font-size:14px;
+	font-weight:200;
+	line-height:15px;
+	padding:0 0 0 20px;
+}
+#slider li#i0_img:hover .tooltip, 
+#slider li#i1_img:hover .tooltip, 
+#slider li#i2_img:hover .tooltip, 
+#slider li#i3_img:hover .tooltip, 
+#slider li#i4_img:hover .tooltip {
+	left:0px;
+}
+#slider:hover li, 
+#slider:hover .progress-bar {
+	animation-play-state:paused;
+	-moz-animation-play-state:paused;
+	-webkit-animation-play-state:paused;
+}
+
+/* PROGRESS BAR */
+.progress-bar { 
+	position:relative;
+	top:-5px;
+	width:390px; 
+	height:5px;
+	background:#000;
+	animation:fullexpand 25s ease-out infinite;
+	-moz-animation:fullexpand 25s ease-out infinite;
+	-webkit-animation:fullexpand 25s ease-out infinite;
+}

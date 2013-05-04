@@ -31,16 +31,6 @@ b {
   border-bottom-color: #CCCCCC;
   color: #0099FF;
 }
-.footer {
-  font-family: "Times New Roman", Times, serif;
-  color: #666666;
-  border-width: thin;
-  margin-left:2px;
-  border-bottom-color: #CCCCCC;
-  border-bottom-style: dotted;
-  font-size: small;
-  margin-top: 220px;
-}
 .sidebar {
   position: absolute; 
   width: 400px;
@@ -53,14 +43,39 @@ b {
 }
 .news {
   position: absolute; 
-  width: 973px;
+  width: auto;
   min-height: 190px; 
-  margin-top: 495px;
+  margin-top: 525px;
   margin-left:2px;
-  margin-right:9px;
+  margin-right:2px;
   margin-bottom: 2px;
   background-color: #fff;
   border: thin solid #C0C0C0;
+}
+.container {
+  position: absolute; 
+  width: auto;
+  min-height: 231px; 
+  margin-top: 281px;
+  margin-left:2px;
+  margin-right:2px;
+  margin-bottom: 2px;
+  overflow:hidden;
+}
+.footer {
+  font-family: "Times New Roman", Times, serif;
+  color: #666666;
+  border-width: thin;
+  margin-left:2px;
+  border-bottom-color: #CCCCCC;
+  border-bottom-style: dotted;
+  font-size: small;
+  margin-top: 245px;
+}
+.tb_news {
+  width:auto;
+  margin-right:9px;
+  position: absolute;
 }
 .body {
   min-height: 483px; 
@@ -84,7 +99,7 @@ table {
 }
 div #mapholder {
     width: auto;
-    height: 465px;
+    height: 502px;
     position:relative;
 }
 tr td {

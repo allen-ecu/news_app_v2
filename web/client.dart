@@ -47,6 +47,7 @@ num itemsperpage = 2;
 num itemsperfetch = 4;
 num currentpages = 1;
 num totalpages = 1;
+
 void main() {
   //initialize cookies
   document.cookie = 'Current=1';
@@ -142,7 +143,7 @@ void main() {
     ajaxGetPNG();
   }
   });
-  
+
   /*
   query('#photo2').onMouseOver.listen((e){
     drawCross(e);
@@ -154,6 +155,45 @@ void main() {
     drawCross(e);
   });
   */
+}
+
+void createAlbum(List<String> photo, Map data){
+  UListElement ue = new UListElement();
+  num len = photo.length;
+  try
+  {
+      for(num i = 0; i< len; i++)
+      {
+        num j = i;
+        j = j + 1;
+        LIElement le = new LIElement();
+        le.id = "i${i}_img";
+        String name = le.id;
+        String cla = '${name}animation';
+        le.classes = [cla];
+        AnchorElement ae = new AnchorElement();
+        ae.href = '#';
+        ImageElement ie = new ImageElement();
+        ie.alt = 'news$j';
+        ie.src = photo[i];
+        ie.width = 388;
+        ie.height = 216;
+        ae.children.add(ie);
+        DivElement de = new DivElement();
+        de.classes = ['tooltip'];
+        HeadingElement he = new HeadingElement.h1();
+        he.text = data['title'];
+        de.children.add(he);
+        le.children.add(ae);
+        le.children.add(de);
+        ue.children.add(le); 
+      }
+      query('#mask').children.add(ue);
+  }
+  catch(e)
+  {
+    print(e.toString());
+  }
 }
 
 bool resetTable(){
@@ -188,11 +228,13 @@ void createTable(List<Map> mapData){
   for(int i = 0; i < len; i++)
   {
   String id = 'newLine$i';
+  String pid = 'phototable$i';
   TableRowElement $id = tBody.insertRow(-1);
-  $id.insertCell(0).text = len==0? null:mapData[i]['photo'];
+  //$id.insertCell(0).text = len==0? null:mapData[i]['photo'];
+  $id.insertCell(0).id = pid;
   $id.insertCell(1).text = len==0? null:mapData[i]['title'];
-  $id.insertCell(2).text = len==0? null:mapData[i]['time'];
-  $id.insertCell(3).text = len==0? null:mapData[i]['description'];
+  $id.insertCell(2).text = len==0? null:mapData[i]['description'];
+  $id.insertCell(3).text = len==0? null:mapData[i]['time'];
   }
 }
 
@@ -884,6 +926,8 @@ processPNG(String data) {
   if(jsonData != null && photoReturned != null)
   {
   loadMap(jsonData, photoReturned, markerImg);
+  //load album
+  createAlbum(photoReturned[0], jsonData[0]);
   }
   else
   {
@@ -893,6 +937,35 @@ processPNG(String data) {
   if(jsonData != null)
   {
   createTable(jsonData);
+  }
+  //load first photo
+  if(photoReturned != null)
+  {
+    for(int i=0;i<photoReturned.length;i++)
+    {
+      ImageElement img = new ImageElement();
+      img.src = photoReturned[i][0];
+      img.id = ('phototd$i');
+      img.height = 30;
+      img.width = 30;
+      query('#phototable$i').replaceWith(img);
+    }
+    
+    query('#phototd0').onClick.listen((e){
+      createAlbum(photoReturned[0], jsonData[0]);
+    });
+    
+    query('#phototd1').onClick.listen((e){ 
+      createAlbum(photoReturned[1], jsonData[1]);
+    });
+    
+    query('#phototd2').onClick.listen((e){
+      createAlbum(photoReturned[2], jsonData[2]);
+    });
+    
+    query('#phototd3').onClick.listen((e){
+      createAlbum(photoReturned[3], jsonData[3]);
+    });
   }
 }
 

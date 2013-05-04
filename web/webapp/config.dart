@@ -1,3 +1,6 @@
+//Mao Weiqing, Master of Computer Scicence, Edith Cowan University, 2012, Western Australia
+//Email: dustonlyperth@gmail.com
+
 //Configuration
 part of server;
 
